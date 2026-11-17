@@ -1,0 +1,114 @@
+{
+  "schema": "pasp-dft-template-dependencies-v1",
+  "route": "pw_relax",
+  "template": "batio3_relax/cubic_reference",
+  "status": "input-derived-not-runtime-tested",
+  "runnable_complete": false,
+  "missing_reason": "UPFs intentionally not distributed; band stages additionally require their own validated SCF products",
+  "bundled_inputs": [
+    {
+      "path": "lattice_model.fdf",
+      "sha256": "298e75692457528b9838ebb47fb0d129d0808c28ce742eb8d101839984d44dfc",
+      "size_bytes": 579
+    },
+    {
+      "path": "siesta.ANI",
+      "sha256": "a3900c9f68d385e8f0bb2532abc2d32b18a9bbe0f8db882c1e26355ebb62898b",
+      "size_bytes": 807
+    }
+  ],
+  "number_of_atoms": 5,
+  "species_order": [
+    "Ba",
+    "Ti",
+    "O"
+  ],
+  "atom_species_records": [
+    "0.00000000000         0.00000000000         0.00000000000   1 Ba 1",
+    "    2.01779150965         2.01779150965         2.01779150965   2 Ti 2",
+    "    0.00000000000         2.01779150965         2.01779150965   3 O 3",
+    "    2.01779150965         0.00000000000         2.01779150965   3 O 4",
+    "    2.01779150965         2.01779150965         0.00000000000   3 O 5"
+  ],
+  "required_upfs": [
+    {
+      "species_index": 1,
+      "filename": "Ba.pw-mt_fhi.UPF",
+      "sha256": "caaf8ecc8d846583011c5da6267bb503a3c0adc09d4198a093f275c3a8c2cee0",
+      "size_bytes": 202020,
+      "metadata_from_pp_header": {
+        "element": "Ba",
+        "pseudo_type": "SL",
+        "relativistic": "no",
+        "has_so": "F",
+        "functional": "SLA-PW",
+        "z_valence": "2.000000000000000E+000",
+        "core_correction": "T",
+        "generated": "Generated using FHI98PP, converted with fhi2upf.x v.5.0.1",
+        "author": "Abinit web site",
+        "date": "10-Jul-2012, PG"
+      },
+      "source_url": null,
+      "attribution": "UPF头标注 Abinit web site / FHI98PP，转换器版本在generated字段；未确认单文件再分发许可。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    },
+    {
+      "species_index": 2,
+      "filename": "Ti.pw-mt_fhi.UPF",
+      "sha256": "d06ca86a326a64bdf21ef14890aea80e1e804ef524605147bdde8739be736628",
+      "size_bytes": 176144,
+      "metadata_from_pp_header": {
+        "element": "Ti",
+        "pseudo_type": "SL",
+        "relativistic": "no",
+        "has_so": "F",
+        "functional": "SLA-PW",
+        "z_valence": "4.000000000000000E+000",
+        "core_correction": "F",
+        "generated": "Generated using FHI98PP, converted with fhi2upf.x v.5.0.1",
+        "author": "Abinit web site",
+        "date": "10-Jul-2012, PG"
+      },
+      "source_url": null,
+      "attribution": "UPF头标注 Abinit web site / FHI98PP，转换器版本在generated字段；未确认单文件再分发许可。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    },
+    {
+      "species_index": 3,
+      "filename": "O.pw-mt_fhi.UPF",
+      "sha256": "5306d98f582ec0dff8699503459ff98befcc1246bf2afb129f74872d23684f2a",
+      "size_bytes": 162023,
+      "metadata_from_pp_header": {
+        "element": "O",
+        "pseudo_type": "SL",
+        "relativistic": "scalar",
+        "has_so": "F",
+        "functional": "SLA-PW",
+        "z_valence": "6.000000000000000E+000",
+        "core_correction": "F",
+        "generated": "Generated using FHI98PP, converted with fhi2upf.x v.5.0.1",
+        "author": "Abinit web site",
+        "date": "10-Jul-2012, PG"
+      },
+      "source_url": null,
+      "attribution": "UPF头标注 Abinit web site / FHI98PP，转换器版本在generated字段；未确认单文件再分发许可。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    }
+  ],
+  "required_runtime_handoff": [],
+  "excluded": [
+    "historical logs",
+    "densities and restart artifacts",
+    "PLUS_U_NS",
+    "locks",
+    "unused structure files",
+    "workshop shared launchers"
+  ],
+  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation"
+}

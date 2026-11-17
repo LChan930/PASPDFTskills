@@ -1,0 +1,4 @@
+interface:
+  display_name: "pasp_DFT"
+  short_description: "仅需 PASP.x 的 PW/PWRS 输入、日志、能带与 DOS 分析"
+  default_prompt: "使用 $pasp-dft，依据用户提供的 PASP.x 版本资料、输入和输出完成 PW/PWRS 输入准备或结果分析；无需源码或私有仓库，明确兼容性、收敛与物理结论的证据边界。"

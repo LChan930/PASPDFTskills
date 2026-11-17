@@ -1,0 +1,51 @@
+# Matched fixed-density AFM NiO bands. Preserve geometry, UPFs and U definition.
+Model DFT
+
+%include siesta.ANI
+
+rmax_cut 6.5
+
+%block Z_values
+28 8
+%endblock Z_values
+
+DFT.ENCUT 35 Hartree
+DFT.ISPIN 2
+%block DFT.MAGMOM
+0 0 2
+0 0 -2
+0 0 0
+0 0 0
+%endblock DFT.MAGMOM
+
+%block pseudo_pot_files
+Ni.pw-mt_fhi.UPF
+O.pw-mt_fhi.UPF
+%endblock pseudo_pot_files
+
+
+DFT.n_manifolds_plus_U 1
+%block DFT_plus_U
+Ni 3d 0.2
+%endblock DFT_plus_U
+
+# Explicit total band count includes spin multiplicity: 32 electrons, 40 states.
+# More empty states and denser path sampling may be required for analysis.
+DFT.NBAND 40
+DFT.NELM 300
+DFT.EDIFF 1.0d-6
+DFT.lbandstructure T
+DFT.nk_pool 40
+DFT.nb_pool 1
+
+# Teaching subset using actual-cell seekpath endpoints; connectors are selected,
+# not a complete recommended magnetic high-symmetry path. 200 path points.
+BandLinesScale ReciprocalLatticeVectors
+%block BandLines
+1   0.0 0.0 0.0 Gamma
+39  0.5 0.0 0.0 T
+40  0.5 0.0 0.5 L
+40  0.0 0.0 0.0 Gamma
+40  1.0 0.5 0.5 F
+40  0.0 0.0 0.0 Gamma
+%endblock BandLines

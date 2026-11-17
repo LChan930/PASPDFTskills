@@ -1,0 +1,63 @@
+{
+  "schema": "pasp-dft-template-dependencies-v1",
+  "route": "pwrs_magnetic",
+  "template": "graphene/01_zero_flux/01_scf",
+  "status": "input-derived-not-runtime-tested",
+  "runnable_complete": false,
+  "missing_reason": "UPFs intentionally not distributed; band stages additionally require their own validated SCF products",
+  "bundled_inputs": [
+    {
+      "path": "lattice_model.fdf",
+      "sha256": "f733a1cdc997b5af8401b2effd29aa67744239a022e719ccabcda3fe56b236ea",
+      "size_bytes": 702
+    },
+    {
+      "path": "siesta.ANI",
+      "sha256": "eab185150453c30e384539bd8c99eaee265b5705d0f6fb5cefdd7f233f81899d",
+      "size_bytes": 458
+    }
+  ],
+  "number_of_atoms": 2,
+  "species_order": [
+    "C"
+  ],
+  "atom_species_records": [
+    "+0.0000000  +0.0000000  +0.0000000  1 C 1",
+    "  +0.0000000  +1.4209745  +0.0000000  1 C 2"
+  ],
+  "required_upfs": [
+    {
+      "species_index": 1,
+      "filename": "C_LDA_SR.ABIv0.4.UPF",
+      "sha256": "4cc1507f1bfa91d23fc245e038f04acbbd39842c83feb94ed7a817ce64d86b0c",
+      "size_bytes": 179196,
+      "metadata_from_pp_header": {
+        "element": "C",
+        "pseudo_type": "NC",
+        "relativistic": "scalar",
+        "has_so": "F",
+        "functional": "PZ",
+        "z_valence": "4.00",
+        "core_correction": "T",
+        "generated": "Generated using ONCVPSP code by D. R. Hamann",
+        "author": "anonymous",
+        "date": "200721"
+      },
+      "source_url": null,
+      "attribution": "文件头记录；再分发许可未确认。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    }
+  ],
+  "required_runtime_handoff": [],
+  "excluded": [
+    "historical logs",
+    "densities and restart artifacts",
+    "PLUS_U_NS",
+    "locks",
+    "unused structure files",
+    "workshop shared launchers"
+  ],
+  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation"
+}

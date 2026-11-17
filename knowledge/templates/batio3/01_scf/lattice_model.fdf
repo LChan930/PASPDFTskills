@@ -1,0 +1,28 @@
+Model DFT
+# 20 reduced k points
+%block kgrid_Monkhorst_Pack
+6 0 0 0
+0 6 0 0
+0 0 6 0
+%endblock kgrid_Monkhorst_Pack
+
+%include siesta.ANI
+
+rmax_cut 6.5
+
+%block Z_values
+56 22 8
+%endblock Z_values
+
+DFT.ENCUT 35 Hartree
+DFT.NELM 150
+DFT.EDIFF 1.0d-7
+DFT.LCHARG 1
+DFT.nk_pool 20
+DFT.nb_pool 2
+
+%block pseudo_pot_files
+Ba.pw-mt_fhi.UPF
+Ti.pw-mt_fhi.UPF
+O.pw-mt_fhi.UPF
+%endblock pseudo_pot_files

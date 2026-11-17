@@ -1,0 +1,30 @@
+# Si native PW-MD; actual source geometry is the local include below.
+Model DFT
+%include siesta.ANI
+
+%block pseudo_pot_files
+Si.pz-vbc.UPF
+%endblock pseudo_pot_files
+
+# Gamma only (default k mesh); no speculative k/band pool splitting (1/1).
+# Common 20 Ha starting cutoff; convergence remains untested.
+DFT.ENCUT 20 Hartree
+DFT.EDIFF 1.0d-7
+DFT.mixing 0.3
+
+# The mass default is 1 amu, NOT the element mass. Species order: Si.
+%block DFT.MASS
+28.086
+%endblock DFT.MASS
+
+DFT.LMD T
+PW_MD.ensemble 2 # 1 NVE, 2 NVT, 3 NPH, 4 NPT
+PW_MD.solver 1 # Match ensemble-effective integrator (1 Verlet / 2 Beeman).
+PW_MD.thermostat 3
+PW_MD.dt 1.0 # fs
+PW_MD.nstep 4000 # Updates; expect step 0 through N.
+PW_MD.temperature 80.0 # K
+PW_MD.velocity_temp 20.0 # K, supported spelling; no explicit initial velocities.
+PW_MD.nelmin 8 # Source minimum electronic iterations, not convergence evidence.
+# Historic thermo_3 failed SCF and stopped early; this is a NEW untested input.
+PW_MD.SMASS 20 # Source Nose inertia; release units require confirmation.

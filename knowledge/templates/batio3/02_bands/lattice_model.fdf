@@ -1,0 +1,32 @@
+# Cubic BaTiO3
+Model DFT
+%include siesta.ANI
+rmax_cut 6.5
+
+%block Z_values
+56 22 8
+%endblock Z_values
+
+DFT.ENCUT 35 Hartree
+DFT.NBAND 20
+DFT.NELM 300
+DFT.EDIFF 1.0d-6
+DFT.lbandstructure T
+DFT.nk_pool 40
+DFT.nb_pool 1
+
+%block pseudo_pot_files
+Ba.pw-mt_fhi.UPF
+Ti.pw-mt_fhi.UPF
+O.pw-mt_fhi.UPF
+%endblock pseudo_pot_files
+
+BandLinesScale ReciprocalLatticeVectors
+%block BandLines
+1   0.0 0.0 0.0  Gamma
+39  0.5 0.0 0.0  X
+40  0.5 0.5 0.0  M
+40  0.0 0.0 0.0  Gamma
+40  0.5 0.5 0.5  R
+40  0.5 0.0 0.0  X
+%endblock BandLines

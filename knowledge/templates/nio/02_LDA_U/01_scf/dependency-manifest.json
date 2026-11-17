@@ -1,0 +1,89 @@
+{
+  "schema": "pasp-dft-template-dependencies-v1",
+  "route": "pw_spin_plus_u",
+  "template": "nio/02_LDA_U/01_scf",
+  "status": "input-derived-not-runtime-tested",
+  "runnable_complete": false,
+  "missing_reason": "UPFs intentionally not distributed; band stages additionally require their own validated SCF products",
+  "bundled_inputs": [
+    {
+      "path": "lattice_model.fdf",
+      "sha256": "0896bea64dd4a60541e41a4610c093f3452a43268760e508d596b0fb915ceb69",
+      "size_bytes": 682
+    },
+    {
+      "path": "siesta.ANI",
+      "sha256": "a24ed3dcca912abb8afdd57e3a3b39a8029c12e3c7caf27d3c7ec88c66b3e181",
+      "size_bytes": 632
+    }
+  ],
+  "number_of_atoms": 4,
+  "species_order": [
+    "Ni",
+    "O"
+  ],
+  "atom_species_records": [
+    "0.000000000   0.000000000   0.000000000  1 Ni 1",
+    "  0.000000000   2.093168776   2.093168776  1 Ni 2",
+    "  2.093168776   2.093168776   2.093168776  2 O 3",
+    "  2.093168776   4.1863375552   4.1863375552  2 O 4"
+  ],
+  "required_upfs": [
+    {
+      "species_index": 1,
+      "filename": "Ni.pw-mt_fhi.UPF",
+      "sha256": "bc11093907eb9606cbe7823462fc05076f705984fc986dcc4d88db11de3b241a",
+      "size_bytes": 181492,
+      "metadata_from_pp_header": {
+        "element": "Ni",
+        "pseudo_type": "SL",
+        "relativistic": "no",
+        "has_so": "F",
+        "functional": "SLA-PW",
+        "z_valence": "1.000000000000000E+001",
+        "core_correction": "F",
+        "generated": "Generated using FHI98PP, converted with fhi2upf.x v.5.0.2",
+        "author": "Abinit web site",
+        "date": "23-Jun-2013 (PG)"
+      },
+      "source_url": null,
+      "attribution": "UPF头标注 Abinit web site / FHI98PP，转换器版本在generated字段；未确认单文件再分发许可。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    },
+    {
+      "species_index": 2,
+      "filename": "O.pw-mt_fhi.UPF",
+      "sha256": "221485036dc00c482f0e7d8d72c3b90ea118796886d3e099270bb620d3a31e50",
+      "size_bytes": 163791,
+      "metadata_from_pp_header": {
+        "element": "O",
+        "pseudo_type": "SL",
+        "relativistic": "scalar",
+        "has_so": "F",
+        "functional": "SLA-PW",
+        "z_valence": "6.000000000000000E+000",
+        "core_correction": "F",
+        "generated": "Generated using FHI98PP, converted with fhi2upf.x v.5.0.1",
+        "author": "Abinit web site",
+        "date": "10-Jul-2012, PG"
+      },
+      "source_url": null,
+      "attribution": "UPF头标注 Abinit web site / FHI98PP，转换器版本在generated字段；未确认单文件再分发许可。",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    }
+  ],
+  "required_runtime_handoff": [],
+  "excluded": [
+    "historical logs",
+    "densities and restart artifacts",
+    "PLUS_U_NS",
+    "locks",
+    "unused structure files",
+    "workshop shared launchers"
+  ],
+  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation"
+}

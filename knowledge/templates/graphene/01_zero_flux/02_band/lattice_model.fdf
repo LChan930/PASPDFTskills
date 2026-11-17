@@ -1,0 +1,37 @@
+# Graphene: matched magnetic-initialization zero-flux SCF control.
+Model DFT
+%include siesta.ANI
+
+DFT.Bfield T
+DFT.PWL.n0 0
+# Teaching starting cutoffs: implicit ENCUT_RHO=140 Hartree; unconverged.
+DFT.ENCUT 35 Hartree
+# Band count is selected automatically by the native initialization.
+# Bare Hartree width, not a unit-bearing FDF energy value; default Fermi-Dirac.
+DFT.SIGMA 0.001
+DFT.NELM 200
+DFT.EDIFF 1.0d-7
+DFT.lbandstructure T
+
+BandLinesScale ReciprocalLatticeVectors
+%block BandLines
+1  -0.500000000     0.000000000      0.00000000       Z-
+19 0.0000000000    0.000000000     0.000000000      G
+20 0.000000000     -0.500000000     0.000000000      X-
+20 0.0000000000    0.000000000     0.000000000      G
+20 0.000000000     0.000000000     -0.500000000      Y-
+20 0.0000000000    0.000000000     0.000000000      G
+20  0.500000000     0.000000000      0.00000000       Z
+20 0.0000000000    0.000000000     0.000000000      G
+20 0.000000000     -0.500000000     0.000000000      X
+20 0.0000000000    0.000000000     0.000000000      G
+20 0.000000000     0.000000000     -0.500000000      Y
+%endblock BandLines
+
+# Defaults retained: ALGO4, ISPIN1, nk_pool=nb_pool=1,
+# Zfield F, ISMEAR -1.
+DFT.RS.PRECONDITIONER 4
+DFT.nk_pool 40
+%block pseudo_pot_files
+C_LDA_SR.ABIv0.4.UPF
+%endblock pseudo_pot_files

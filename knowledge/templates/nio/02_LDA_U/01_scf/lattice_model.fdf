@@ -1,0 +1,44 @@
+# Four-atom AFM-II NiO. Ni +/-2 are initial moments.
+# 4x8x8 = 256 full k points. 39 reduced k points.
+# Type-1 Ueff, when present, is 0.2 Hartree (~5.4423 eV).
+Model DFT
+
+%block kgrid_Monkhorst_Pack
+4 0 0 0
+0 8 0 0
+0 0 8 0
+%endblock kgrid_Monkhorst_Pack
+
+%include siesta.ANI
+
+rmax_cut 6.5
+
+%block Z_values
+28 8
+%endblock Z_values
+
+DFT.ENCUT 35 Hartree
+DFT.ISPIN 2
+%block DFT.MAGMOM
+0 0 2
+0 0 -2
+0 0 0
+0 0 0
+%endblock DFT.MAGMOM
+DFT.NELM 200
+DFT.EDIFF 1.0d-7
+DFT.mixing.method 3
+DFT.nk_pool 39
+DFT.nb_pool 1
+
+%block pseudo_pot_files
+Ni.pw-mt_fhi.UPF
+O.pw-mt_fhi.UPF
+%endblock pseudo_pot_files
+
+DFT.LCHARG 1
+
+DFT.n_manifolds_plus_U 1
+%block DFT_plus_U
+Ni 3d 0.2
+%endblock DFT_plus_U

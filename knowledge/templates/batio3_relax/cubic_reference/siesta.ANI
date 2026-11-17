@@ -1,0 +1,17 @@
+# Cubic reference.
+NumberOfAtoms   5
+number_of_species   3
+LatticeConstant       1 Ang
+%block LatticeVectors
+        4.0355830193         0.0000000000         0.0000000000
+        0.0000000000         4.0355830193         0.0000000000
+        0.0000000000         0.0000000000         4.0355830193
+%endblock LatticeVectors
+AtomicCoordinatesFormat  NotScaledCartesianAng
+%block AtomicCoordinatesAndAtomicSpecies
+    0.00000000000         0.00000000000         0.00000000000   1 Ba 1
+    2.01779150965         2.01779150965         2.01779150965   2 Ti 2
+    0.00000000000         2.01779150965         2.01779150965   3 O 3
+    2.01779150965         0.00000000000         2.01779150965   3 O 4
+    2.01779150965         2.01779150965         0.00000000000   3 O 5
+%endblock AtomicCoordinatesAndAtomicSpecies

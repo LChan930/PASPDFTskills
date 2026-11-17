@@ -1,0 +1,90 @@
+{
+  "schema": "pasp-dft-template-dependencies-v1",
+  "route": "pw_soc",
+  "template": "bi2se3/02_SOC/01_scf",
+  "status": "input-derived-not-runtime-tested",
+  "runnable_complete": false,
+  "missing_reason": "UPFs intentionally not distributed; band stages additionally require their own validated SCF products",
+  "bundled_inputs": [
+    {
+      "path": "lattice_model.fdf",
+      "sha256": "c8b3b09c5c4a707ccd6dfcfd05d0be48ce0af25830527d7c7ea4762686a0c27c",
+      "size_bytes": 526
+    },
+    {
+      "path": "siesta.ANI",
+      "sha256": "3e217c3a56f679f4dda0e6776a9da354322175b2a8910e5344d165d84f0db386",
+      "size_bytes": 583
+    }
+  ],
+  "number_of_atoms": 5,
+  "species_order": [
+    "Bi",
+    "Se"
+  ],
+  "atom_species_records": [
+    "0.399 0.399 0.399 1 Bi",
+    "0.601 0.601 0.601 1 Bi",
+    "0.000 0.000 0.000 2 Se",
+    "0.206 0.206 0.206 2 Se",
+    "0.794 0.794 0.794 2 Se"
+  ],
+  "required_upfs": [
+    {
+      "species_index": 1,
+      "filename": "Bi_ONCV_PZ_fr.upf",
+      "sha256": "32030ac391a96ddc181f47dd6ed436afe8ce87da82c589832937931b92c7c2e5",
+      "size_bytes": 436190,
+      "metadata_from_pp_header": {
+        "element": "Bi",
+        "pseudo_type": "NC",
+        "relativistic": "full",
+        "has_so": "T",
+        "functional": "PZ",
+        "z_valence": "15.00",
+        "core_correction": "T",
+        "generated": "Generated using ONCVPSP code by D. R. Hamann",
+        "author": "anonymous",
+        "date": "220414"
+      },
+      "source_url": "https://raw.githubusercontent.com/cndaqiang/ONCVPSP_LDA/8305870fe4d064f864ef431783cf11aa7482b842/sg15_PZ_3.3.1/Bi_ONCV_PZ_fr.upf",
+      "attribution": "ONCVPSP 3.3.1 / D. R. Hamann; ONCVPSP_LDA pinned commit; embedded GNU GPL wording without version; SG15 CC BY-SA 4.0 lineage context. Redistribution not established here.",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    },
+    {
+      "species_index": 2,
+      "filename": "Se_ONCV_PZ_fr.upf",
+      "sha256": "a84b25788806a5d90f678891f759fe97a5b83ad1f81927cd7fcee46fa036c83e",
+      "size_bytes": 250511,
+      "metadata_from_pp_header": {
+        "element": "Se",
+        "pseudo_type": "NC",
+        "relativistic": "full",
+        "has_so": "T",
+        "functional": "PZ",
+        "z_valence": "6.00",
+        "core_correction": "F",
+        "generated": "Generated using ONCVPSP code by D. R. Hamann",
+        "author": "anonymous",
+        "date": "220414"
+      },
+      "source_url": "https://raw.githubusercontent.com/cndaqiang/ONCVPSP_LDA/8305870fe4d064f864ef431783cf11aa7482b842/sg15_PZ_3.3.1/Se_ONCV_PZ_fr.upf",
+      "attribution": "ONCVPSP 3.3.1 / D. R. Hamann; ONCVPSP_LDA pinned commit; embedded GNU GPL wording without version; SG15 CC BY-SA 4.0 lineage context. Redistribution not established here.",
+      "bundled": false,
+      "required_from_user": true,
+      "redistribution_status": "unresolved-not-bundled"
+    }
+  ],
+  "required_runtime_handoff": [],
+  "excluded": [
+    "historical logs",
+    "densities and restart artifacts",
+    "PLUS_U_NS",
+    "locks",
+    "unused structure files",
+    "workshop shared launchers"
+  ],
+  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation"
+}

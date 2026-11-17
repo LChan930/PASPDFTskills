@@ -1,0 +1,17 @@
+# GPAW five-atom rhombohedral tutorial cell; not an LDA-relaxed structure.
+NumberOfAtoms 5
+number_of_species 2
+LatticeConstant 1 Ang
+%block LatticeVectors
+-2.069000000000000 -1.194537706953336 9.546666666666667
+ 2.069000000000000 -1.194537706953336 9.546666666666667
+ 0.000000000000000  2.389075413906671 9.546666666666667
+%endblock LatticeVectors
+AtomicCoordinatesFormat Fractional
+%block AtomicCoordinatesAndAtomicSpecies
+0.399 0.399 0.399 1 Bi
+0.601 0.601 0.601 1 Bi
+0.000 0.000 0.000 2 Se
+0.206 0.206 0.206 2 Se
+0.794 0.794 0.794 2 Se
+%endblock AtomicCoordinatesAndAtomicSpecies

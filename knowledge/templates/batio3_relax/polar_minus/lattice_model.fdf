@@ -1,0 +1,42 @@
+# Fixed-cell, 50-step ionic relaxation; displaced Ti geometry.
+# Cutoff and k mesh require convergence tests.
+Model DFT
+
+%block kgrid_Monkhorst_Pack
+4 0 0 0
+0 4 0 0
+0 0 4 0
+%endblock kgrid_Monkhorst_Pack
+
+%include siesta.ANI
+
+rmax_cut 6.5
+
+%block Z_values
+56 22 8
+%endblock Z_values
+
+DFT.ENCUT 35 Hartree
+
+DFT.luse_all_kpoints T
+
+DFT.NELM 200
+DFT.EDIFF 1.0d-7
+
+DFT.mixing.method 1
+DFT.mixing 0.16
+
+DFT.LRELAX T
+DFT.nstep 50
+
+DFT.EDIFFG -0.02
+
+%block DFT.MASS
+137.327 47.867 15.999
+%endblock DFT.MASS
+
+%block pseudo_pot_files
+Ba.pw-mt_fhi.UPF
+Ti.pw-mt_fhi.UPF
+O.pw-mt_fhi.UPF
+%endblock pseudo_pot_files

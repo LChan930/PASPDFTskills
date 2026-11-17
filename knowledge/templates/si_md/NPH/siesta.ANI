@@ -1,0 +1,13 @@
+NumberOfAtoms   2
+number_of_species   1
+LatticeConstant     1 Ang
+%block LatticeVectors
+0.0 2.6988039699 2.6988039699
+2.6988039699 0.0 2.6988039699
+2.6988039699 2.6988039699 0.0
+%endblock LatticeVectors
+AtomicCoordinatesFormat  NotScaledCartesianAng
+%block AtomicCoordinatesAndAtomicSpecies
+  0.00000000   0.13000000   0.13000000  1 Si 1
+  1.34940198   1.34940198   1.34940198  1 Si 2
+%endblock AtomicCoordinatesAndAtomicSpecies

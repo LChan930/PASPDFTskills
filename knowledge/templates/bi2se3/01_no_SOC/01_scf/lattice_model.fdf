@@ -1,0 +1,30 @@
+Model DFT
+%include siesta.ANI
+DFT.ENCUT 30 Hartree
+DFT.ISPIN 4
+DFT.SIGMA 0.001
+%block DFT.MAGMOM
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+%endblock DFT.MAGMOM
+# Site integration radii in Angstrom, species order Bi Se.
+%block DFT.RWIGS
+1.3 1.1
+%endblock DFT.RWIGS
+DFT.EDIFF 1.0d-7
+DFT.LCHARG 1
+DFT.nk_pool 8
+DFT.nb_pool 5
+# 32 reduced k points
+%block kgrid_Monkhorst_Pack
+6 0 0 0
+0 6 0 0
+0 0 6 0
+%endblock kgrid_Monkhorst_Pack
+%block pseudo_pot_files
+Bi_ONCV_PZ_sr.upf
+Se_ONCV_PZ_sr.upf
+%endblock pseudo_pot_files
