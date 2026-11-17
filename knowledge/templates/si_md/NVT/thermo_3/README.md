@@ -45,3 +45,10 @@
 核对当前阶段 MPI ranks。`DFT.nk_pool` 必须同时整除 ranks 与**实际生成/约化后的全局 k 点数**，不是网格乘积或高对称节点数。`DFT.nb_pool` 整除 ranks/nk_pool；普通 PW 不普遍要求总带数被 band 池整除。池数乘积不必等于 ranks。PWRS 与 SCF_ONLY 的 band 池为 1，PWRS 另需 ALGO=4。未知实际点数时，候选输入删去两个资源键以采用参考默认 1/1，或在已授权资源内减少 ranks。不得为整除而改变网格、磁序、对称性或路径。SCF 与 bands 独立检查。模板原池数是历史设置，不是通用可运行承诺。
 
 失败时保留本次日志和输入哈希，不复制旧结果凑齐。历史输出观察见[run notes](../../../../workflows/pw_md_run_notes.md)，它们不证明本目录已运行。下一阶段和验收问题见[用户检查单](../../../../workflows/pw_md_user_checklist.md)。
+
+
+## 完整历史档案更新（0.2.2）
+
+完整替换档案：历史 2 Ha、64 Si、Nose 恒温器 3（SMASS=20），1 fs × 4000 步；4001 完整帧，0–4 ps。全部日志步与轨迹一致，正常结束，无 SCF 失败。2–4 ps 温度 79.91318 ± 45.62510 K（总体标准差）；全程 80.02175 ± 46.93557 K。ZIP SHA256: 0f44c3e71a98af2f23dd2f26300f9ebe40d0cc7cf4f3170aa22e58729a6cdf59。旧截断/日志不匹配样本的失败审计保留为 superseded original archive，不能套用于本档案。当前模板为独立的 20 Ha 输入，状态仍 input-derived-not-runtime-tested；历史成功不证明代码故障修复或当前输入已经运行，也未建立 cutoff/dt 收敛或热平衡。
+
+恒温器映射：1 Langevin、2 Andersen、3 Nose、4 速度重标度。档案只作历史证据，本技能不分发运行日志、轨迹或 UPF。

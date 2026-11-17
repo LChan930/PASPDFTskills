@@ -78,3 +78,7 @@ species1.upf
 逐阶段列出结构、物种/UPF 元数据与摘要、输入/include、工作目录、所选物理设置及版本依据。按[k 点与并行池](kpoint-band-parallelism.md)使用约化后全局点数；未观察到点数时保留1/1默认，并说明效率未知，不为了整除改变对称性。
 
 先完成文件与输入一致性检查，再按授权运行。输入静态检查不证明目标二进制可读、SCF 收敛或精度达标。结果状态与文件交接分别按[验证与报告](validation.md)、[PW 用户指南](../modules/pw.md)解释；启动环境问题见[提交排错](workshop.md)。
+
+## 包内静态审计
+
+生成候选输入后，按 [输入审计契约](input-audit.md) 使用 `knowledge/scripts/audit_inputs.py` 读取确切 FDF 或运行目录。工具覆盖可确定的 include/块、结构/物种/UPF 与阶段依赖、有限登记表默认/条件及 ranks/pool 一致性。`--irreducible-kpoints` 只接受本阶段已证实的全局约化点数；未知则省略。工具不自动挑选物理参数，也不认证目标发行版或运行收敛。

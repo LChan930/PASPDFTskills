@@ -30,3 +30,6 @@ Unknown / failed / next permitted action:
 ```
 
 历史边界见[run notes](pw_md_run_notes.md)；无法获得的事实保留unknown，不填写假定成功结果。
+
+- [ ] 已运行包内 `audit_inputs.py` 并处理 ERROR/WARN/UNKNOWN，未以未知 IBZ 猜并行池。
+- [ ] 已运行包内 `analyze_md.py` 并保存窗口、帧/步/时间、匹配日志和输入哈希；帧完整与电子/物理收敛分开记录。

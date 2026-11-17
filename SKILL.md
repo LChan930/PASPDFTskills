@@ -49,12 +49,14 @@ do not invoke colon-qualified nested skill names or assume separate registration
 
 ## Supported workflows
 
+- Deterministic offline input auditing with `knowledge/scripts/audit_inputs.py`: recursive includes, dependencies, documented defaults and pool consistency. Read the [input audit contract](knowledge/reference/topics/input-audit.md); physical choices and release compatibility still require interpretation.
 - PW SCF, fixed-density path bands and SCF-reference handoff.
 - Collinear magnetism, AFM and DFT+U.
 - Noncollinear and SOC comparisons.
 - Fixed-cell ionic relaxation.
 - PWRS orbital magnetic fields, zero/finite flux and boundary settings.
 - Native ionic MD with its supported ensemble branches.
+- Native MD frame, time, energy, temperature and log consistency analysis with `knowledge/scripts/analyze_md.py`; read the [MD analysis contract](knowledge/reference/topics/md-analysis.md). File completeness does not certify physical convergence.
 - Existing-output analysis: logs, eigenvalues, sampled band edges, DOS and MD
   interpretation, band figures, and native charge/current field slices or
   whole-cell integrals. For fields, load the

@@ -31,3 +31,9 @@
 能带图默认 eV，允许 Hartree 或用户指定的受支持单位。图内只保留材料/方法标题、坐标、路径与必要图例；收敛状态、缺失自旋信息等写在图外报告/JSON。参见 [绘图规范](../../knowledge/reference/topics/band-plotting.md)。
 
 有独立只读核查需要且平台允许委派时，提供文件、问题、范围和交付格式，使用 [核查契约](../pasp-dft-verifier/skill.md)。核查不替代主控制器的科学判断，也不制造额外的重复确认流程。
+
+## 包内自动化优先
+
+准备或检查 PW/PWRS 输入时，先读 [输入审计契约](../../knowledge/reference/topics/input-audit.md)，运行实际根目录的 `knowledge/scripts/audit_inputs.py`；使用确切 FDF 或运行目录，按已知分配传 `--ranks`，只在有全局约化 k 点证据时传 `--irreducible-kpoints`。解释 ERROR/WARN/UNKNOWN，默认与条件覆盖不是物理推荐，静态通过不晋级为运行/收敛通过。
+
+已有 MD 轨迹走 [输出分析](../workflow-output-analysis/skill.md) 或 [MD](../workflow-pw-md/skill.md)，执行包内 `knowledge/scripts/analyze_md.py`，可附匹配 `--input`、`--log` 及明确的 fs 统计窗。逐帧检查和统计交给确定性工具；ensemble 守恒量、平衡及数值收敛由原始证据解释。不临时重写相同解析器，也不要求用户持有源码或研讨会私有脚本。

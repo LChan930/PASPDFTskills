@@ -8,7 +8,7 @@
   "bundled_inputs": [
     {
       "path": "lattice_model.fdf",
-      "sha256": "b667642cbcc6daa790d31bdceefc91ee4a4f93466bed6594ae5217a1968888a1",
+      "sha256": "e79a639b16f0467726ff6d16babd87afbc69532c9fd9a6295896ec9172fb38ed",
       "size_bytes": 624
     },
     {

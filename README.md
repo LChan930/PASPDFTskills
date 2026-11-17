@@ -64,6 +64,8 @@ pasp-dft/
     │   └── toc/
     ├── templates/                   # 24 组真实输入与依赖清单
     └── scripts/
+        ├── audit_inputs.py
+        ├── analyze_md.py
         ├── analyze_outputs.py
         ├── analyze_eigenvalues.py
         ├── plot_bands.py
@@ -110,12 +112,42 @@ pasp-dft/
 
 | 脚本 | 用途 | 所需环境 |
 | --- | --- | --- |
+| [audit_inputs.py](knowledge/scripts/audit_inputs.py) | include/块、结构/UPF 依赖、默认/条件设置与并行池静态审计 | Python 3.10+，仅标准库；保留包内参数表 |
+| [analyze_md.py](knowledge/scripts/analyze_md.py) | 原生逐帧完整性、时间/步数、统计窗与日志一致性 | Python 3.10+，分析仅标准库 |
 | [analyze_outputs.py](knowledge/scripts/analyze_outputs.py) | 日志证据摘要、阶段状态、文件清点 | Python 3.10+，仅标准库 |
 | [analyze_eigenvalues.py](knowledge/scripts/analyze_eigenvalues.py) | 原生 bands 或 stdout `EIGENVAL` 表、条件采样带边 | Python 3.10+、NumPy；保留同目录 `plot_bands.py` |
 | [plot_bands.py](knowledge/scripts/plot_bands.py) | 原生能带 PNG/PDF/SVG 与 JSON | Python 3.10+、NumPy、Matplotlib |
 | [plot_fields.py](knowledge/scripts/plot_fields.py) | 原生电荷/电流网格、切片/积分、图与证据报告 | Python 3.10+、NumPy、Matplotlib |
 
 仅阅读文档和准备输入无需安装绘图库。分析使用现有合适环境；这些脚本不启动 PASP 或 MPI。先查看相应 `--help`，不要把 Python 辅助脚本选项传给 `PASP.x`。
+
+### 输入静态审计
+
+六个公开 CLI 均从实际技能根目录调用。先按当前版本的 `--help` 选择选项；下面的输入路径由用户替换，输出必须是尚不存在的新文件。
+
+```bash
+python -B "$PASP_DFT_ROOT/knowledge/scripts/audit_inputs.py" --help
+python -B "$PASP_DFT_ROOT/knowledge/scripts/audit_inputs.py" lattice_model.fdf --lang zh-Hans --format json --output input-audit.json
+python -B "$PASP_DFT_ROOT/knowledge/scripts/audit_inputs.py" run-directory --ranks 8 --irreducible-kpoints 4 --format markdown --output input-audit.md
+```
+
+最后一行的 ranks 与 irreducible-kpoints 仅演示接口，必须替换成实际分配的进程数与本阶段已证实的**全局约化 k 点数**。没有点数证据就省略该选项，不能用 SCF 网格乘积冒充 IBZ 点数。目录输入依实际 CLI 的主文件选择规则解析；多候选时指定确切 FDF。
+
+审计递归读取 include，检查块/重复与未知键、结构/物种/UPF 和阶段依赖，并基于包内有限参数登记表记录显式设置、参考默认及可证明的条件值。未知键可能是新发行版扩展；缺重启/UPF 是缺少证据，不能伪造兼容性或已运行结论。退出 0 表示审计完成，仍需读 ERROR/WARN/UNKNOWN；退出 2 表示 CLI/输入不可读或报告写入失败。默认值不是物理推荐。完整范围见 [输入审计](knowledge/reference/topics/input-audit.md)。
+
+### 原生 MD 自动分析
+
+```bash
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" --help
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" output_MD.dat --input lattice_model.fdf --log stdout.answer --lang zh-Hans --format json --output md-report.json
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" output_MD.dat --input lattice_model.fdf --window-start-fs 2000 --window-end-fs 4000 --format markdown --output md-window.md
+```
+
+轨迹是实际原生格式，文件名不限。`--input` 与 `--log` 可省略；没有输入/日志时相关 requested/read-back、电子停止证据保留 unknown。窗口以 fs 为单位，示例 2000–4000 fs 只适用于覆盖该区间的轨迹，不自动代表平衡段。工具检查完整帧、有限值、原子标识、步/时间连续性与可对照的请求长度，统计能量、温度及已支持的晶胞/压力信息；具体字段和限制见 [MD 分析](knowledge/reference/topics/md-analysis.md)。
+
+`analyze_md.py` 退出 1 表示确定的帧/长度/日志或文件错误，CLI 参数错误为 2；退出 0 仍不认证物理收敛。NVT/NPT 不套用 NVE 守恒判据，扩展焓/能量定义、统计窗、热平衡、时间步和截断收敛仍须解释。日志摘要不能替代逐帧分析，两份报告可以互补。
+
+两个新工具默认英文，支持 `--lang en|zh-Hans|zh-Hant`、`--format markdown|json` 与拒绝覆盖的 `--output`；省略输出文件则向标准输出写报告。它们不要求源码、私有脚本或 PASP 执行。
 
 ### 日志、能级与能带
 
@@ -128,7 +160,7 @@ python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_eigenvalues.py" spectrum --i
 python -B "$PASP_DFT_ROOT/knowledge/scripts/plot_bands.py" spectrum --output-dir figures --name bands-ev --unit eV --title "Electronic band structure"
 ```
 
-目录日志扫描默认不递归，需分析子目录时显式使用 `--recursive`。报告默认英语，日志/能级/场报告可选 `--lang en`、`zh-Hans`、`zh-Hant`；JSON 键、状态码和原始证据保持稳定。**`plot_bands.py` 没有 `--lang`**，科学图内使用清楚的标题、坐标和必要图例，收敛与来源限制写在图外报告和 JSON。
+目录日志扫描默认不递归，需分析子目录时显式使用 `--recursive`。报告默认英语，输入/MD/日志/能级/场报告可选 `--lang en`、`zh-Hans`、`zh-Hant`；JSON 键、状态码和原始证据保持稳定。**`plot_bands.py` 没有 `--lang`**，科学图内使用清楚的标题、坐标和必要图例，收敛与来源限制写在图外报告和 JSON。
 
 能带/能级默认 eV，也支持 meV、Ha/Hartree、Ry/Rydberg；自定义单位须同时给正有限 `--units-per-hartree`。`--reference-ha`、`--ef-hartree` 始终使用 Hartree。原生 bands 的绝对能量按文件头参考只减一次；已移位的 `plot.dat` 不能再减一次，也不是此原生读取器的完整输入。
 

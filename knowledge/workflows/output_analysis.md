@@ -65,3 +65,13 @@ python "$SKILL_ROOT/knowledge/scripts/plot_bands.py" "$RUN_DIR/TB.bands" --outpu
 ## 电荷 / 电流场分支
 
 对真实电荷或电流输出，先按[场绘图参考](../reference/topics/field-plotting.md)识别网格、晶格、分量、单位与积分约定。先明确需要的是单平面局域体密度（`--mode slice`，默认 $e/\text{Å}^3$）还是整胞层积分面密度（`--mode project`，默认 $e/\text{Å}^2$），并在命令中显式指定模式、切片位置或整胞积分范围。单层材料仍可画这两种量；不能仅凭“单层”选模式。若用户要某一物理层的积分，先确定层边界；当前脚本未实现有限层窗口，全胞投影会合并所有层。电流也要区分局域体电流密度与积分后的面电流。再查本包 `knowledge/scripts/plot_fields.py --help` 使用实际支持的选项。Graphene新审计中两分支电荷积分为8e，只有有限磁通SCF提供CRTCAR；仅对存在的匹配数据作图，缺失的电流记录missing。物理参考和运行验证放报告/JSON，图题保持科学内容，明确切片或整胞积分；核对色标维度与JSON/Markdown中的 `representation`、`display_unit`、`integration_scope` 一致。
+
+## 0.3.0 MD 逐帧执行
+
+第五阶段不再只依赖通用日志摘要或现场脚本。使用实际包根目录：
+
+```bash
+python -B "$SKILL_ROOT/knowledge/scripts/analyze_md.py" "$RUN_DIR/output_MD.dat" --input "$RUN_DIR/lattice_model.fdf" --log "$RUN_DIR/stdout.answer" --format json --output "$REPORT_DIR/md-report.json"
+```
+
+仅有轨迹时省略可选输入/日志，相关证据记 unknown；如指定 fs 窗口，记录所选范围与实际采样数。保留 requested、read-back、effective 的区别及逐步电子证据。确定性帧完整性/统计与物理热平衡/精度收敛分别交付，参考 [MD 分析](../reference/topics/md-analysis.md)。

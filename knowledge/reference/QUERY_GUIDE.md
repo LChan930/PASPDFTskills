@@ -4,6 +4,8 @@
 | --- | --- |
 | tag 的语法、单位、默认值 | [参数索引](params/INDEX.md) |
 | 一个文件由谁写出、何时读取 | [文件索引](files/INDEX.md) |
+| 递归 include、输入/依赖、默认条件与池配置的自动检查 | [输入审计](topics/input-audit.md) |
+| 原生 MD 完整帧、时间/统计窗与日志自动核对 | [MD 分析](topics/md-analysis.md) |
 | 如何写最小输入/处理默认覆盖 | [输入生成](topics/input-generation.md) |
 | 约化 k 点与能带并行 | [并行池](topics/kpoint-band-parallelism.md) |
 | PW 与 PWRS 功能边界 | [PW](modules/pw.md)、[PWRS](modules/pwrs.md) |

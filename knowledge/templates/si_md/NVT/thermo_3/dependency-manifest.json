@@ -121,5 +121,22 @@
     "unused structure files",
     "workshop shared launchers"
   ],
-  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation"
+  "validation_scope": "input hashes and local include closure only; no PASP/MPI calculation",
+  "historical_reference": {
+    "status": "verified-historical-2Ha-not-current-template-runtime",
+    "archive_sha256": "0f44c3e71a98af2f23dd2f26300f9ebe40d0cc7cf4f3170aa22e58729a6cdf59",
+    "trajectory_sha256": "945f028a3cb96238eeba41e1b10fc172c7492e0443a7ada8bafc85646409c996",
+    "frames": 4001,
+    "steps": [
+      0,
+      4000
+    ],
+    "thermostat": 3,
+    "thermostat_name": "Nose",
+    "cutoff_Ha": 2,
+    "temperature_2to4ps_mean_K": 79.91318340829586,
+    "temperature_2to4ps_std_population_K": 45.625096357180915,
+    "supersedes": "original truncated/mismatched thermo_3 sample; original audit retained",
+    "redistributed_runtime_files": false
+  }
 }

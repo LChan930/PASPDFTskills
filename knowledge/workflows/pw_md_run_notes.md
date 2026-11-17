@@ -15,3 +15,10 @@
 记录run ID、命令/版本已知信息、输入/include/UPF哈希、退出、各层收敛/完整性、实际产物哈希和引用位置。静态检查、进程成功、算法收敛、精度收敛分别写。现代marker缺失时结合发行资料与实际legacy区块判断，不能自动当失败或自动当通过。没有运行就明确input-only；不要用历史曲线补数字。
 
 下一步按[状态机](pw_md_state_machine.md)定位，用户操作见[完整课](pw_md.md)与[检查单](pw_md_user_checklist.md)。
+
+
+## 完整历史档案更新（0.2.2）
+
+完整替换档案：历史 2 Ha、64 Si、Nose 恒温器 3（SMASS=20），1 fs × 4000 步；4001 完整帧，0–4 ps。全部日志步与轨迹一致，正常结束，无 SCF 失败。2–4 ps 温度 79.91318 ± 45.62510 K（总体标准差）；全程 80.02175 ± 46.93557 K。ZIP SHA256: 0f44c3e71a98af2f23dd2f26300f9ebe40d0cc7cf4f3170aa22e58729a6cdf59。旧截断/日志不匹配样本的失败审计保留为 superseded original archive，不能套用于本档案。当前模板为独立的 20 Ha 输入，状态仍 input-derived-not-runtime-tested；历史成功不证明代码故障修复或当前输入已经运行，也未建立 cutoff/dt 收敛或热平衡。
+
+恒温器映射：1 Langevin、2 Andersen、3 Nose、4 速度重标度。档案只作历史证据，本技能不分发运行日志、轨迹或 UPF。

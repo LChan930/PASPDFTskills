@@ -18,3 +18,5 @@ S4预检将当前输入/include/UPF/重启依赖、物理设置、发行兼容�
 S5材料运行仅在已有任务授权覆盖实际执行时进行；仅要求输入/教程/分析时不擅自启动PASP。已有授权的读取、可逆编写和本地分析直接完成。缺关键科学选择时只问所缺信息，不复制上游其他物理模型的确认标记。S6失败时保留日志和产物，结论标失败/未知，不晋级为validated/handoff-ready。
 
 每个关键目录的PROGRESS至少记录：Status、Route/Branch/Stage、输入和依赖哈希、已接受设置、实际命令与ranks、上游来源、Gate evidence、缺失项、允许的下一步。结束状态可以是input-ready-with-missing-UPFs、output-validated或blocked-by-real-data；这三者不能互称已运行成功。
+
+S4 将包内 `audit_inputs.py` 的输入/依赖与资源报告作为静态证据；S6–S7 使用包内 `analyze_md.py` 的逐帧、时间、统计窗和日志核对报告。工具执行不新增材料运行阶段；确定性检查通过不自动晋级为物理收敛。

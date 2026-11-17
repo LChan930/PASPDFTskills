@@ -29,7 +29,7 @@ DFT.NELM 200
 DFT.EDIFF 1.0d-7
 DFT.mixing.method 3
 DFT.nk_pool 39
-DFT.nv_pool 1
+DFT.nb_pool 1
 
 %block pseudo_pot_files
 Ni.pw-mt_fhi.UPF

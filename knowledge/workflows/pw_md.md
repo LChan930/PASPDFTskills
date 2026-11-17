@@ -35,7 +35,7 @@
 | NVE | 2原子，零初温、位移初态，solver1 | 400 / 0.5fs | 已建立NVE能量定义后检查漂移；thermostat1请求的阻尼被ensemble1置零 |
 | NVT/thermo_1 | 64原子，目标80K、初速20K，Langevin_Gamma0.1 | 4000 / 1fs | Gamma是质量阻尼约定，不能直接写成1/fs |
 | NVT/thermo_2 | 64原子，目标80K、初速20K，Andersen_Prob0.02/fs | 4000 / 1fs | 当前带PW_MD前缀；历史无前缀未生效，旧运行用默认0.1不能当新结果 |
-| NVT/thermo_3 | 64原子，目标80K、初速20K，SMASS20 | 4000 / 1fs | 保留惯性参数，发行版单位待核对；历史SCF失败，新输入未证明已修复 |
+| NVT/thermo_3 | 64原子，目标80K、初速20K，SMASS20 | 4000 / 1fs | 保留惯性参数，发行版单位待核对；旧截断样本已被完整2Ha Nose档案替代；当前20Ha输入未运行验证 |
 | NVT/thermo_4 | 64原子，目标80K、初速20K，tolp5K/nraise80 | 4000 / 1fs | 速度重标度，检查实际温度窗口与生效周期 |
 | NPH | 2原子，44GPa，PMASS400amu，solver2/barostat1 | 400 / 1fs | 近零温初态；普通Ep+Ek不自动等于守恒扩展焓 |
 | NPT | 2原子，40GPa，温度1e-8K，tolp1e-8K，nraise40 | 4000 / 1fs | 近零温高压演示，不是有限温度基准 |
@@ -88,3 +88,22 @@ cd <当前阶段的新运行目录>
 核对当前阶段 MPI ranks。`DFT.nk_pool` 必须同时整除 ranks 与**实际生成/约化后的全局 k 点数**，不是网格乘积或高对称节点数。`DFT.nb_pool` 整除 ranks/nk_pool；普通 PW 不普遍要求总带数被 band 池整除。池数乘积不必等于 ranks。PWRS 与 SCF_ONLY 的 band 池为 1，PWRS 另需 ALGO=4。未知实际点数时，候选输入删去两个资源键以采用参考默认 1/1，或在已授权资源内减少 ranks。不得为整除而改变网格、磁序、对称性或路径。SCF 与 bands 独立检查。模板原池数是历史设置，不是通用可运行承诺。
 
 参见[并行参考](../reference/topics/kpoint-band-parallelism.md)、[输入生成](../reference/topics/input-generation.md)、[验证层次](../reference/topics/validation.md)、[PW模块](../reference/modules/pw.md)、[PWRS模块](../reference/modules/pwrs.md)。
+
+
+## 完整历史档案更新（0.2.2）
+
+完整替换档案：历史 2 Ha、64 Si、Nose 恒温器 3（SMASS=20），1 fs × 4000 步；4001 完整帧，0–4 ps。全部日志步与轨迹一致，正常结束，无 SCF 失败。2–4 ps 温度 79.91318 ± 45.62510 K（总体标准差）；全程 80.02175 ± 46.93557 K。ZIP SHA256: 0f44c3e71a98af2f23dd2f26300f9ebe40d0cc7cf4f3170aa22e58729a6cdf59。旧截断/日志不匹配样本的失败审计保留为 superseded original archive，不能套用于本档案。当前模板为独立的 20 Ha 输入，状态仍 input-derived-not-runtime-tested；历史成功不证明代码故障修复或当前输入已经运行，也未建立 cutoff/dt 收敛或热平衡。
+
+恒温器映射：1 Langevin、2 Andersen、3 Nose、4 速度重标度。档案只作历史证据，本技能不分发运行日志、轨迹或 UPF。
+
+## 0.3.0 包内自动检查
+
+准备运行时，使用 [输入审计](../reference/topics/input-audit.md) 对实际 FDF/目录进行 include、结构、UPF/重启依赖、参考默认和资源一致性检查；缺 IBZ 时不猜点数，不因默认 1/1 池声称性能最优。
+
+已有轨迹时执行：
+
+```bash
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" output_MD.dat --input lattice_model.fdf --log stdout.answer --lang zh-Hans --format json --output md-report.json
+```
+
+以上路径由用户替换为匹配本次运行的实际文件。`--input`/`--log` 可省略，缺少时相关证据保留 unknown。统计窗口通过 `--window-start-fs`、`--window-end-fs` 显式给出；不能把后半程自动称作平衡。工具提供逐帧/连续性、请求长度、统计与日志一致性证据；ensemble 的能量/焓定义、温压采样、数值精度和热平衡仍按 [MD 分析](../reference/topics/md-analysis.md) 解释。
