@@ -48,6 +48,30 @@ def digest(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+def upf_filename(line: str) -> str:
+    """Decode one bounded Fortran character item, retaining its quote evidence."""
+    text = line.strip()
+    if not text:
+        raise ValueError('Provide one UPF filename per species.')
+    if text[0] in {'"', "'"}:
+        quote, result, i = text[0], [], 1
+        while i < len(text):
+            if text[i] == quote:
+                if i + 1 < len(text) and text[i + 1] == quote:
+                    result.append(quote); i += 2; continue
+                tail = text[i + 1:].strip()
+                if tail and not tail.startswith(('#', '!')):
+                    raise ValueError('Provide one quoted UPF filename per species, without trailing items.')
+                if not result:
+                    raise ValueError('UPF filename must not be empty.')
+                return ''.join(result)
+            result.append(text[i]); i += 1
+        raise ValueError('Unclosed UPF filename quote.')
+    text = re.split(r'[#!]', text, maxsplit=1)[0].strip()
+    if not text or re.search(r"[\s/,;*='\"]", text):
+        raise ValueError('Quote the complete UPF path with single or double quotes; unquoted directory separators, spaces and commas are unsafe.')
+    return text
+
 def registry() -> tuple[dict, list]:
     """Use packaged public parameter tables, never production-source discovery."""
     result, sources = {}, []
@@ -75,6 +99,7 @@ class Audit:
         self.findings, self.files, self.includes = [], {}, []
         self.scalars, self.blocks = defaultdict(list), defaultdict(list)
         self.expanded, self.block = [], None
+        self.raw_lines = {}
         self.defaults, self.effective = {}, {}
 
     def finding(self, severity, code, message, anchors=None):
@@ -108,6 +133,7 @@ class Audit:
             self.finding('ERROR', 'input_read', str(exc)); return
         for lineno, line in enumerate(text.splitlines(), 1):
             anchor = {'file': str(path), 'line': lineno}
+            self.raw_lines[(str(path), lineno)] = line
             if len(self.expanded) >= MAX_LINES:
                 self.finding('ERROR', 'resource_limit', 'Expanded line budget exceeded.', [anchor]); return
             try:
@@ -148,7 +174,8 @@ class Audit:
                     self.finding('ERROR', 'block_mismatch', 'Opening and closing block names differ.', [self.block['anchor'], anchor])
                 self.blocks[self.block['name']].append(self.block); self.block = None
             elif self.block:
-                self.block['rows'].append({'tokens': row, 'anchor': anchor})
+                self.block['rows'].append({'tokens': row, 'anchor': anchor,
+                                          'raw': self.raw_lines[(anchor['file'], anchor['line'])]})
             elif key.startswith('%'):
                 self.finding('WARN', 'unknown_directive', 'Unrecognized FDF directive; release compatibility unknown.', [anchor])
             else:
@@ -259,9 +286,11 @@ class Audit:
         nsp=self.num('number_of_species',1,True)
         if len(rows)!=nsp: self.finding('ERROR','upf_count','pseudo_pot_files count must match species count.')
         for i,row in enumerate(rows,1):
-            if len(row['tokens'])!=1:
-                self.finding('ERROR','upf_filename','One quoted filename per species required.',[row['anchor']]);continue
-            path=(self.cwd/row['tokens'][0]).resolve()
+            try:
+                filename = upf_filename(row['raw'])
+            except ValueError as exc:
+                self.finding('ERROR','upf_path_quote',str(exc),[row['anchor']]);continue
+            path=(self.cwd/filename).resolve()
             if not path.is_file():
                 self.finding('ERROR','missing_upf',f'Missing required UPF: {path}',[row['anchor']]);continue
             self.dependency(path,'upf')
@@ -326,14 +355,36 @@ class Audit:
             if rs and self.num('dft.algo',4,True)!=4:self.finding('ERROR','rs_algo','Complete PWRS requires ALGO=4 in snapshot.')
             if nb>1 and self.num('dft.algo',4,True)!=4:self.finding('WARN','band_pool_algorithm','Band parallelism with this algorithm needs release evidence.')
         self.effective['documented_overrides']={'rs':{'value':bool(rs),'basis':'Bfield forces RS or requested RS','runtime_verified':False}}
-        needs=self.flag('dft.lbandstructure') or self.num('dft.rcharg',0,True)==1
+        band=self.flag('dft.lbandstructure')
+        chern=self.num('dft.lchern',0,True)!=0
+        lnsc=self.flag('dft.lnsc')
+        rwave=self.num('dft.rwave',0,True)==1
+        needs=band or self.num('dft.rcharg',0,True)==1 or self.flag('dft.lberry.readchg')
+        if chern and lnsc and rwave:
+            first=self.num('dft.lberry.nint',1,True)
+            last=self.num('dft.lberry.nend',None,True)
+            requested=self.num('dft.nband',0,True)
+            if first is None or last is None or first<1 or last<first or (requested and last>requested):
+                self.finding('ERROR','chern_wave_bounds','Wave-only Chern requires explicit LBERRY.NEND and 1 <= LBERRY.NINT <= LBERRY.NEND <= available loaded bands; NINT defaults to 1. Current NBAND, when explicit, must cover the selection.')
+            if self.num('dft.algo',4,True)==1:
+                self.finding('ERROR','chern_wave_algorithm','ALGO=1 is unsupported for the direct WAVECAR Chern route; use a supported wave-read algorithm.')
+            self.finding('UNKNOWN','chern_wave_support','Direct wave Chern needs executable support for explicit band groups. Verify full two-dimensional WAVECAR mesh, k order, basis, loaded bands and normalized states. WAVECAR.restart can supply validated energies; legacy wave files alone cannot certify energy isolation or automatic occupied-group selection. This audit does not decode or authenticate that spectrum.')
+        if chern and lnsc and not rwave and not needs:
+            self.finding('WARN','chern_density_restart','Chern and LNSC do not automatically read density. For the density-restart workflow set RCHARG=1 with matching CHGCAR and RWAVE=0.')
         if needs:
-            for name in ['CHGCAR','CHGCAR.restart']+(['PLUS_U_NS'] if u else []):
+            names=['CHGCAR']+(['CHGCAR.restart'] if band else [])+(['PLUS_U_NS'] if u else [])
+            if not band and (self.cwd/'CHGCAR.restart').is_file(): names.append('CHGCAR.restart')
+            for name in names:
                 p=self.cwd/name;self.dependency(p,'restart')
                 self.finding('UNKNOWN','restart_provenance',f'{name}: '+('exists; input compatibility and same-run upstream SCF acceptance unverified.' if p.is_file() else 'missing required handoff evidence.'))
-        if self.num('dft.rwave',0,True)==1:
+        if rwave and self.num('dft.algo',4,True)!=1:
             p=self.cwd/'WAVECAR';self.dependency(p,'restart')
             self.finding('UNKNOWN','wave_restart', 'WAVECAR present; compatibility unverified.' if p.is_file() else 'Missing WAVECAR for requested wave restart.')
+            meta=self.cwd/'WAVECAR.restart'
+            if meta.is_file(): self.dependency(meta,'restart')
+            self.finding('UNKNOWN','wave_spectrum', 'WAVECAR.restart present; binding, spectrum and compatibility require executable validation.' if meta.is_file() else 'No WAVECAR.restart; updated explicit-group legacy wave Chern can proceed without energy/gap certification.')
+        elif rwave:
+            self.finding('WARN','wave_restart_ignored','ALGO=1 does not read WAVECAR in this snapshot; RWAVE does not supply its orbitals.')
 
     def run(self):
         self.expand(self.main);self.parse()
@@ -393,6 +444,13 @@ EXPLANATIONS={
  'missing_upf':('缺少必需的赝势文件。','缺少必需的贗勢檔案。'),
  'upf_count':('赝势文件数与物种数不匹配。','贗勢檔案數與物種數不匹配。'),
  'upf_filename':('每个物种须提供一个赝势文件名。','每個物種須提供一個贗勢檔名。'),
+ 'upf_path_quote':('赝势路径须用完整的单引号或双引号包围；每物种一行，未加引号的目录分隔符、空格和逗号不安全。','贗勢路徑須用完整的單引號或雙引號包圍；每物種一行，未加引號的目錄分隔符、空格和逗號不安全。'),
+ 'chern_wave_bounds':('纯波函数陈数须显式设置 LBERRY.NEND，并满足 1<=NINT<=NEND<=实际读入带数；NINT 默认1，显式 NBAND 也须覆盖该范围。','純波函數陳數須顯式設定 LBERRY.NEND，並滿足 1<=NINT<=NEND<=實際讀入帶數；NINT 預設1，顯式 NBAND 也須涵蓋該範圍。'),
+ 'chern_wave_algorithm':('ALGO1 不支持直接读取 WAVECAR 求陈数，须使用支持波函数读取的算法。','ALGO1 不支援直接讀取 WAVECAR 求陳數，須使用支援波函數讀取的演算法。'),
+ 'chern_wave_support':('须核对可执行文件支持显式带组陈数及实际网格/带数；匹配 WAVECAR.restart 可恢复能谱，离线审计不认证绑定关系、占据或能隙。','須核對執行檔支援顯式帶組陳數及實際網格/帶數；匹配 WAVECAR.restart 可恢復能譜，離線審計不認證綁定關係、佔據或能隙。'),
+ 'wave_spectrum':('WAVECAR.restart 的绑定和能谱须由可执行文件验证；旧 WAVECAR 缺少伴随文件时，显式带组流程不认证能隙。','WAVECAR.restart 的綁定與能譜須由執行檔驗證；舊 WAVECAR 缺少伴隨檔時，顯式帶組流程不認證能隙。'),
+ 'chern_density_restart':('Chern 与 LNSC 不自动读密度；密度重启流程应显式设置 RCHARG1，提供匹配 CHGCAR，并使用 RWAVE0。','Chern 與 LNSC 不自動讀密度；密度重啟流程應顯式設定 RCHARG1，提供匹配 CHGCAR，並使用 RWAVE0。'),
+ 'wave_restart_ignored':('此版本 ALGO1 不读 WAVECAR，RWAVE 不提供其初始轨道。','此版本 ALGO1 不讀 WAVECAR，RWAVE 不提供其初始軌道。'),
  'cutoff_value':('截断能须为带支持单位的正有限值。','截斷能須為帶支援單位的正有限值。'),
  'magmom_default':('未提供磁矩块；默认磁矩不能证明目标磁序。','未提供磁矩區塊；預設磁矩不能證明目標磁序。'),
  'hubbard_row':('Hubbard 行的物种、壳层、数值或局域原子编号无效。','Hubbard 列的物種、殼層、數值或局域原子編號無效。'),

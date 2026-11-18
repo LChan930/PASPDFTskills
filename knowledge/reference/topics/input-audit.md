@@ -35,12 +35,12 @@ main input, registry/read failure or refused report creation. Inspect `status`,
 | Registry | Known names/types/default descriptions loaded from the three packaged `reference/params/input-parameters-*.md` tables | Unknown keys WARN, including `DFT.nv_pool` with a safe nk/nb typo hint. No automatic spelling correction. `rmax_cut` is recognized as an ancillary name; its physical adequacy is not checked. |
 | Scalar types | Finite numeric values, integer literals, logical literals, explicit energy units where documented | Recognized name does not mean all enum/conditional rules are implemented. Many workflow-specific types and blocks remain outside semantic coverage. |
 | Structure | Positive atom/species count, coordinate row count, finite xyz, species index/symbol consistency, lattice-block shape/conflict, positive supported-unit lattice constant | Coordinate rows require at least native `x y z species_index symbol`; trailing user fields are preserved. No determinant, lattice-parameter geometry, supercell expansion or minimum-distance check. POSCAR is inventoried but not decoded. |
-| Species and UPFs | Native coordinate symbols/indices, `pseudo_pot_files` count/order, existence/hash, bounded PP_HEADER metadata for element/valence/relativity/SOC/type/XC | Do not require another program's `ChemicalSpeciesLabel`. If supplied, it is compatibility information, not the audited mapping. Legacy unrecognized UPF headers remain UNKNOWN; filenames are not metadata. No projector/radial validity or cross-species XC compatibility proof. |
+| Species and UPFs | Native coordinate symbols/indices, `pseudo_pot_files` count/order, raw path quoting, existence/hash, bounded PP_HEADER metadata for element/valence/relativity/SOC/type/XC | Do not require another program's `ChemicalSpeciesLabel`. If supplied, it is compatibility information, not the audited mapping. Legacy unrecognized UPF headers remain UNKNOWN; filenames are not metadata. No projector/radial validity or cross-species XC compatibility proof. |
 | Spin/SOC | ISPIN 1/2/4, MAGMOM three finite components per atom when present; has_so=T requires ISPIN4 in this snapshot | Missing MAGMOM uses documented-default warning; no magnetic-order selection. ISPIN4 alone does not establish SOC. Per-species SR/FR metadata is retained without inventing a global scalar/spinor channel split. |
 | Hubbard | Manifold count versus rows, type1/type2 fields, finite U/J, shell syntax, actual structure symbols, species-local IDs/ranges/overlap, documented task conflicts | No projector-radius selection, U calibration, occupation-matrix validation or independent effective-Hamiltonian reconstruction. |
 | Cutoffs | Selected ENCUT converted to Ha; missing ENCUT defaults to 10 Ha; missing ENCUT_RHO becomes four times selected ENCUT | Ha/Hartree, Ry/Rydberg, eV and meV are recognized. Values are documented static predictions, not runtime read-back or cutoff convergence evidence. |
 | Parallel pools | Positive integer pools, nk divides actual ranks, nb divides ranks/nk, nk divides supplied actual global k count; PWRS/SCF_ONLY/Chern constraints | `--ranks` is actual MPI ranks, not nodes or threads. Supply `--irreducible-kpoints` from matched global read-back, or actual generated path count for bands. No automatic launcher/log pairing and no raw-mesh-to-IBZ substitution. No universal NBAND % nb_pool rule or performance claim. |
-| Stage handoff | Band/RCHARG requests inventory CHGCAR + CHGCAR.restart, +U additionally PLUS_U_NS; RWAVE inventories WAVECAR | Missing restart or upstream compatibility is UNKNOWN evidence. Existing bytes do not prove accepted upstream SCF or matching structure/spin/U/UPFs. Binary restart content is not decoded. |
+| Stage handoff | Band requests CHGCAR + CHGCAR.restart; RCHARG/LBERRY.READCHG requests CHGCAR and inventories metadata if present; +U additionally PLUS_U_NS; effective RWAVE inventories WAVECAR | Ordinary restart can use legacy density without metadata; band handoff requires metadata. ALGO1 ignores ordinary RWAVE and is unsupported for direct wave Chern. Updated Chern+LNSC+RWAVE1 requires explicit NEND and valid selected bounds, with executable support, actual loaded band/mesh compatibility and energy isolation retained as UNKNOWN. Density-only Chern+LNSC without requested density read warns. Missing restart or upstream compatibility is UNKNOWN evidence. Restart file content is not decoded. |
 
 `requested` preserves all explicit definitions and source anchors.
 `documented_defaults` records only defaults actually consulted by checked rules.
@@ -61,3 +61,15 @@ reads at most 256 KiB of each header; dependency SHA-256 streams the actual file
 No content is silently repaired. Generic parser success cannot prove full
 workflow support, SCF convergence, correct ground state, reasonable k mesh,
 forces, stress or physical accuracy.
+
+### UPF path syntax
+
+Each species has one character filename. Single/double quoted relative and
+absolute paths are accepted; safe unquoted basenames remain accepted. Unsafe
+unquoted directory paths, whitespace or commas produce ERROR `upf_path_quote`
+before file-existence checks. The bounded UPF decoder retains original quotes
+and supports doubled matching quotes inside quoted names; it is not a complete
+Fortran/FDF parser. Relative UPFs are resolved against the audit run directory
+(the main input's parent), including rows expanded from another include folder.
+Launch PASP in that same directory, or audit its actual staged input directory.
+Existence/hash and valid syntax do not certify all runtime UPF compatibility.

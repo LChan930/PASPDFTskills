@@ -1,5 +1,7 @@
 # 文件索引
 
+- [WAVECAR.restart](WAVECAR.restart.md)：新版波函数能谱伴随文件、旧文件兼容与校验边界。
+
 - [CRTCAR](CRTCAR.md)：原生电流网格及配套元数据。
 
 - [lattice_model.fdf](lattice_model.fdf.md)：原生 DFT 主输入。

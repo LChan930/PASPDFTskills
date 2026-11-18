@@ -54,8 +54,8 @@
 | --- | --- | --- | --- |
 | `DFT.LBERRY.NPPSTR` | integer | 16 | 每条k串点数，替换所选方向采样；按任务收敛测试。 |
 | `DFT.LBERRY.IGPAR` | integer | 1 | 倒格矢方向索引，参考需对角网格矩阵。 |
-| `DFT.LBERRY.NINT` | integer | 1 | Chern选定带区间起点；准确拼写NINT，需满足占据与隔离条件。 |
-| `DFT.LBERRY.NEND` | integer | 实际共同占据带数 | 区间终点；满足1<=NINT<=NEND<=共同占据带数，不写死未知材料值。 |
+| `DFT.LBERRY.NINT` | integer | 1 | Chern选定带组起点，准确拼写NINT。普通求态流程检查占据与隔离；新版直接波函数流程须满足1<=NINT<=NEND<=实际读入带数。 |
+| `DFT.LBERRY.NEND` | integer | 普通求态流程为实际共同占据带数；直接波函数流程须显式提供 | 普通求态流程终点不超过共同占据带数。新版LCHERN1+LNSCT+RWAVE1明确选择带组（可含未占据带）；若恢复能谱则检查相邻带隔离，不推断缺失占据。详见[两种陈数流程](../modules/pw.md#chern-calculation-after-scf)。 |
 | `DFT.LCHERN.NKX` | integer | 12 | 正整数，二维全网格第一方向点数；参考单k池/单band池、对角网格，沿用偏移。 |
 | `DFT.LCHERN.NKY` | integer | 12 | 正整数，二维全网格第二方向点数，第三方向为1；同NKX限制。 |
 | `DFT.Efield.IGPAR` | integer | 3 | 电场流程的倒格方向，不继承LBERRY.IGPAR默认；绝缘占据等条件仍需满足。ISPIN1参考要求偶数电子。 |

@@ -51,6 +51,131 @@ Choose pools from actual generated/reduced points, not the raw mesh product.
 Do not change sampling or symmetry just to fit a resource request. Nonzero
 initial MAGMOM does not establish a magnetic ground state or an insulating gap.
 
+## Density and wavefunction restart
+
+`DFT.RCHARG` and `DFT.RWAVE` are independent integer switches and can both be 1.
+For ordinary SCF with `DFT.ALGO > 1`, the snapshot behavior is:
+
+| RCHARG | RWAVE | Initial density | Initial orbitals |
+| --- | --- | --- | --- |
+| 0 | 0 | Default initialization | Default initialization |
+| 1 | 0 | Read CHGCAR | Default initialization |
+| 0 | 1 | Default initialization | Read WAVECAR |
+| 1 | 1 | Read CHGCAR | Read WAVECAR |
+
+Density is initialized first; loading WAVECAR does not reconstruct or overwrite
+that initial density. Thus with both switches enabled the first Hamiltonian uses
+the imported density, while the eigensolver starts from the imported orbitals.
+Ordinary SCF then updates density normally; RCHARG does not freeze it. Path bands
+and non-self-consistent calculations instead solve with their fixed potential
+during diagonalization. Path bands automatically request density reading, so
+RCHARG is redundant there; a changed band-path k mesh is not automatically a
+compatible WAVECAR restart.
+
+`DFT.ALGO 1` does not read WAVECAR in this snapshot: its dense eigensolve replaces
+the initialized orbitals. Full PWRS is restricted to its supported algorithm
+(normally ALGO 4); do not transfer the entire PW table to unsupported routes.
+The restricted FFT_BOX route forbids both read switches.
+
+An enabled supported read requires its file: missing or invalid input is an
+error, not a promise of automatic fallback. Keep matching density, structure,
+species/UPFs, electron count, spin representation, cutoff/basis and k-point
+coverage. A wave restart may read fewer stored bands than requested, leaving
+extra bands initialized; this does not certify arbitrary changed settings.
+Ordinary density restart can accept legacy CHGCAR without companion metadata;
+present corrupt/mismatched metadata must not be bypassed. Path bands require the
+valid SCF density/reference pair described below. This is a compatibility
+snapshot and static verification, not a newly executed SCF benchmark.
+
+## Chern calculation after SCF
+
+The selected-subspace Chern formula uses overlaps of the selected wavefunctions;
+numerical eigenvalues are not required by that formula. Energies and EF support
+automatic occupied-band selection and sampled gap/isolation checks. The two
+routes below keep those roles separate. Both require the supported scalar or
+collinear representation (ISPIN 1/2), norm-conserving UPFs, one k pool and one
+band pool, and a complete two-dimensional mesh.
+
+### Direct wavefunction route in the updated executable
+
+The executable update supports an explicitly selected band group from WAVECAR,
+without reconstructing energies or silently diagonalizing again. For example,
+the following selects band 1 (change the bound to the actual intended group):
+
+```text
+DFT.LCHERN 1
+DFT.LNSC T
+DFT.RWAVE 1
+DFT.ALGO 4
+DFT.LBERRY.NEND 1
+DFT.LCHERN.NKX 12
+DFT.LCHERN.NKY 12
+DFT.nk_pool 1
+DFT.nb_pool 1
+```
+
+`DFT.LBERRY.NINT` defaults to 1; NEND must be explicit, with
+`1 <= NINT <= NEND <= actual loaded bands`. Extra requested bands that were
+not present in WAVECAR are not valid loaded states. RCHARG is unnecessary for
+this route. The wave file must cover the exact complete Chern mesh, k ordering,
+basis and spin representation; an ordinary SCF mesh or band-path WAVECAR is
+not automatically reusable. The updated executable initializes that mesh
+before reading the wave file and validates available states. ALGO 1 does not
+support this direct wave-read route.
+
+The updated full-mesh reader accepts wave files produced with either the
+existing serial layout or the existing distributed/pool layout. Thus a pooled
+producer can supply this one-k-pool/one-band-pool direct Chern workflow, provided
+the actual complete mesh, basis and selected bands match. This is a supported
+direction of reuse, not a general interchange guarantee: the unchanged
+distributed reader does not accept serial-produced wave files in the reverse
+direction. Keep the matching companion when transferring either layout.
+
+The wave array alone does not restore numerical eigenvalues/EF. The updated
+writer also produces [WAVECAR.restart](../files/WAVECAR.restart.md), binding the saved spectrum to its wave
+file and compatible geometry/k grid. A verified companion restores available
+energies and enables applicable sampled band-isolation checks. Explicit groups
+in this direct route may include unoccupied bands; they are not automatically
+restricted to the occupied subspace. A present corrupt
+or mismatched companion is an error; do not delete it to bypass validation.
+Legacy WAVECAR without a companion remains usable for an explicitly selected
+group, but energy/gap checks are reported unavailable. If the saved spectrum
+does not cover a needed adjacent band, that isolation check is unavailable,
+not certified. A provided closing gap is rejected. NEND remains explicit in
+the direct wave route even when the companion exists.
+
+Specify the intended group from independent physical evidence; a computed
+Chern number alone does not certify energetic isolation or an insulating ground
+state. Check the actual executable's support: updating this skill does not
+update a cluster binary, and older unpatched binaries need the density route.
+
+### Density route with a newly calculated spectrum
+
+Use a matching SCF density and recompute states on the full two-dimensional
+Chern grid when an energy-based occupied-group and gap check is required:
+
+```text
+DFT.LCHERN 1
+DFT.LNSC T
+DFT.RCHARG 1
+DFT.RWAVE 0
+DFT.ALGO 4
+DFT.LCHERN.NKX 12
+DFT.LCHERN.NKY 12
+DFT.nk_pool 1
+DFT.nb_pool 1
+```
+
+Both examples are partial controls, not complete inputs or converged mesh
+recommendations. Retain compatible structure, UPFs, spin, cutoffs, occupations
+and the required files. Chern/LNSC alone do not enable density or wave reads.
+RCHARG 1 explicitly requests CHGCAR (LBERRY.READCHG can also request density).
+LNSC holds the potential fixed while new states and energies are calculated;
+the existing occupied-subspace/gap validation applies to that spectrum.
+Converge the two-dimensional mesh. With LNSC F, wave input only initializes a
+subsequent SCF; it is not direct reuse of a finished Chern state. Neither route
+establishes full material convergence merely by completing the Chern routine.
+
 ## SCF to path bands
 
 For a fresh SCF intended to supply bands, retain `DFT.LCHARG 1` and the intended

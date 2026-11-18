@@ -189,3 +189,7 @@ python -B "$PASP_DFT_ROOT/knowledge/scripts/plot_fields.py" CRTCAR --kind curren
 本包没有通用原生 DOS/PDOS 读取绘图器，也没有已验证的原生 DOS 输出模板；[DOS 参考](knowledge/reference/topics/dos.md) 用于核对格式、展宽、单位和归一，不能把路径点等权当作体相 DOS 积分。日志摘要也不能替代 [MD 帧与守恒量检查](knowledge/reference/topics/md-analysis.md)。
 
 输入模板、解析测试与历史案例分别说明各自覆盖范围。未知版本支持、缺失 UPF/上游产物、未检查的占据/自旋、未验证的精度和缺失场数据都应写在随附报告中。技能包不提供源码、未公开算法说明或二进制探测要求；结果解释仍以用户当前文件和可获得的发行证据为准。
+
+## 0.3.1 路径与重启说明
+
+补充 [RCHARG/RWAVE 四种组合及求解器限制](knowledge/reference/modules/pw.md#density-and-wavefunction-restart)，并在 [输入生成](knowledge/reference/topics/input-generation.md) 说明带引号的 UPF 目录路径。离线审计保留原始路径引号，拒绝未加引号的目录路径与分隔符；带引号路径不限于本地文件名。[两种陈数流程](knowledge/reference/modules/pw.md#chern-calculation-after-scf) 区分新版可执行文件的显式带组纯波函数计算与密度重启后重新求态，说明没有本征值时无法认证能隙。更新技能不会替换用户或集群的 PASP 可执行文件；没有执行新的材料 SCF 或集群陈数计算。

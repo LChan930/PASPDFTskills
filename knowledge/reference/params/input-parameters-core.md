@@ -38,8 +38,8 @@
 | `DFT.spin_exchange_Rcut` | real | 0 | 裸Bohr截断；0不是自动覆盖所有所需邻壳的保证，需按任务选范围。 |
 | `DFT.LCHARG` | integer | 0 | 1请求写密度CHGCAR及参考.restart；SCF_ONLY不写。+U还需占据数据；不是布尔开关。 |
 | `DFT.LWAVE` | integer | 0 | 1请求波函数输出；SCF_ONLY不写。核对版本的实际文件与重启条件。 |
-| `DFT.RCHARG` | integer | 0 | 1请求读密度；能带或LBERRY.READCHG已触发读取时通常可省。可读旧密度不证明能带前驱有效。 |
-| `DFT.RWAVE` | integer | 0 | 1请求读波函数；依求解器/任务而定，不承诺所有ALGO通用重启。 |
+| `DFT.RCHARG` | integer | 0 | 1请求初始化密度；可与RWAVE1共存，波函数读入不覆盖该密度，普通SCF随后正常更新。能带自动读密度，RCHARG可省；参见[重启组合](../modules/pw.md#density-and-wavefunction-restart)。 |
+| `DFT.RWAVE` | integer | 0 | 1请求读WAVECAR初始轨道，可与RCHARG1共存；ALGO1不读，受限FFT_BOX禁止。需匹配基组/自旋/k点等，读文件不等于兼容或收敛。参见[重启组合](../modules/pw.md#density-and-wavefunction-restart)。 |
 | `DFT.LCURRENT` | integer | 0 | 电流输出；受SCF_ONLY与FFT_BOX限制，不作为普通模板必需项。 |
 | `DFT.LVLOC` | logical | F | 局域势输出；类型不同于LCHARG，SCF_ONLY不写。 |
 | `DFT.RVLOC` | logical | F | 特定非自洽任务读取局域势，不是一般SCF密度重启替代。 |
