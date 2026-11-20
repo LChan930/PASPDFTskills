@@ -92,7 +92,15 @@ snapshot and static verification, not a newly executed SCF benchmark.
 The selected-subspace Chern formula uses overlaps of the selected wavefunctions;
 numerical eigenvalues are not required by that formula. Energies and EF support
 automatic occupied-band selection and sampled gap/isolation checks. The two
-routes below keep those roles separate. Both require the supported scalar or
+routes below keep those roles separate. Prefer the direct wavefunction route
+with DFT.RWAVE 1 when a matching full-mesh WAVECAR is available. For this
+workflow use at least 24 x 24 x 1 as the starting Chern mesh, then increase the
+mesh to verify convergence of the Chern number and, when needed, the Berry
+curvature. Set DFT.LCHERN.NKX and DFT.LCHERN.NKY explicitly: their executable
+defaults are 12 and 12. The third direction has one point. These controls set
+the Chern mesh independently of the SCF mesh.
+
+Both require the supported scalar or
 collinear representation (ISPIN 1/2), norm-conserving UPFs, one k pool and one
 band pool, and a complete two-dimensional mesh.
 
@@ -108,8 +116,8 @@ DFT.LNSC T
 DFT.RWAVE 1
 DFT.ALGO 4
 DFT.LBERRY.NEND 1
-DFT.LCHERN.NKX 12
-DFT.LCHERN.NKY 12
+DFT.LCHERN.NKX 24
+DFT.LCHERN.NKY 24
 DFT.nk_pool 1
 DFT.nb_pool 1
 ```
@@ -121,7 +129,11 @@ this route. The wave file must cover the exact complete Chern mesh, k ordering,
 basis and spin representation; an ordinary SCF mesh or band-path WAVECAR is
 not automatically reusable. The updated executable initializes that mesh
 before reading the wave file and validates available states. ALGO 1 does not
-support this direct wave-read route.
+support this direct wave-read route. To prepare a WAVECAR for direct reuse,
+use DFT.LWAVE 1 in an eigenstate-producing calculation on the full target
+mesh. Match the mesh offsets as well as the dimensions. A finer Chern mesh
+requires states on that mesh. If the available WAVECAR is too coarse, use
+the fixed-density route below to recompute states.
 
 The updated full-mesh reader accepts wave files produced with either the
 existing serial layout or the existing distributed/pool layout. Thus a pooled
@@ -152,7 +164,8 @@ update a cluster binary, and older unpatched binaries need the density route.
 ### Density route with a newly calculated spectrum
 
 Use a matching SCF density and recompute states on the full two-dimensional
-Chern grid when an energy-based occupied-group and gap check is required:
+Chern grid when a matching WAVECAR is unavailable or automatic occupied-group selection
+is required:
 
 ```text
 DFT.LCHERN 1
@@ -160,14 +173,14 @@ DFT.LNSC T
 DFT.RCHARG 1
 DFT.RWAVE 0
 DFT.ALGO 4
-DFT.LCHERN.NKX 12
-DFT.LCHERN.NKY 12
+DFT.LCHERN.NKX 24
+DFT.LCHERN.NKY 24
 DFT.nk_pool 1
 DFT.nb_pool 1
 ```
 
-Both examples are partial controls, not complete inputs or converged mesh
-recommendations. Retain compatible structure, UPFs, spin, cutoffs, occupations
+Both examples show stage-specific controls. Retain compatible structure, UPFs,
+spin, cutoffs, occupations
 and the required files. Chern/LNSC alone do not enable density or wave reads.
 RCHARG 1 explicitly requests CHGCAR (LBERRY.READCHG can also request density).
 LNSC holds the potential fixed while new states and energies are calculated;
