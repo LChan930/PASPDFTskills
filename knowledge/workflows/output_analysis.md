@@ -24,6 +24,14 @@ python "$SKILL_ROOT/knowledge/scripts/analyze_outputs.py" "$RUN_DIR" --format js
 
 默认报告英文，可显式选择 `--lang en`、`--lang zh-Hans`、`--lang zh-Hant`。扫描子目录必须用户需要时加 `--recursive`，避免把多个运行误合并。检查模型初始化、进程/结束、SCF/能带迭代、警告与输出候选，并保留raw日志片段。脚本摘要是有界提取，不能代替材料精度验证或全MD帧结构检查。
 
+已有固定晶胞离子弛豫日志时，直接用专用工具获取逐步结果。以自定义日志名为例。
+
+```bash
+python -B "$SKILL_ROOT/knowledge/scripts/analyze_relax.py" "$RUN_DIR/relax.answer" --input "$RUN_DIR/lattice_model.fdf" --format json --output "$REPORT_DIR/relax-report.json"
+```
+
+没有匹配的 FDF 时省略 `--input`。复核离子终止、进程完成、电子求解及输入阈值诊断。按步号与日志行号引用能量、最大力和末次完整坐标。见 [弛豫分析](../reference/topics/relaxation-analysis.md)。
+
 ### 第三阶段：能级与能带分析
 
 已确认原生band格式时运行：

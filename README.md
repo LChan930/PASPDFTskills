@@ -1,6 +1,6 @@
 # pasp_DFT 使用说明
 
-`pasp-dft` 是面向原生 PW/PWRS DFT 的自包含技能包，显示名为 **pasp_DFT**，规范调用名为 **`$pasp-dft`**。它帮助准备和检查输入、理解计算阶段，以及分析用户已有的日志、能级、能带、DOS、MD 和电荷/电流场。LCAO、有效哈密顿量及其他模型使用各自的技能。
+`pasp-dft` 是面向原生 PW/PWRS DFT 的自包含技能包，显示名为 **pasp_DFT**，规范调用名为 **`$pasp-dft`**。它帮助准备和检查输入、理解计算阶段，以及分析用户已有的日志、固定晶胞离子弛豫、能级、能带、DOS、MD 和电荷/电流场。LCAO、有效哈密顿量及其他模型使用各自的技能。
 
 计算指导以用户合法持有的 `PASP.x`、配套发行资料、输入、UPF 赝势和实际结果为依据；离线分析已有输出时不需要运行 `PASP.x`。包内知识是兼容性快照，不是对所有 PASP 发行版本的功能保证。
 
@@ -66,6 +66,7 @@ pasp-dft/
     └── scripts/
         ├── audit_inputs.py
         ├── analyze_md.py
+        ├── analyze_relax.py
         ├── analyze_outputs.py
         ├── analyze_eigenvalues.py
         ├── plot_bands.py
@@ -92,7 +93,7 @@ pasp-dft/
 | 固定晶胞离子弛豫 | [弛豫](subskills/workflow-pw-relax/skill.md) | [BaTiO3 极性构型](knowledge/workflows/pw_relax.md) |
 | PWRS、零/有限磁通和磁边界 | [PWRS 磁场](subskills/workflow-pwrs-magnetic/skill.md) | [Graphene](knowledge/workflows/pwrs_magnetic.md) |
 | 原生 `DFT.LMD`，NVE/NVT/NPH/NPT 的适用分支 | [原生 MD](subskills/workflow-pw-md/skill.md) | [Si 七组 MD](knowledge/workflows/pw_md.md) |
-| 已有日志、能级、能带、DOS、MD、电荷/电流场 | [输出分析](subskills/workflow-output-analysis/skill.md) | [分析流程](knowledge/workflows/output_analysis.md) |
+| 已有日志、弛豫、能级、能带、DOS、MD、电荷/电流场 | [输出分析](subskills/workflow-output-analysis/skill.md) | [分析流程](knowledge/workflows/output_analysis.md) |
 
 “怎么开始、下一步是什么、这一步改哪些设置”先走 workflow；“某个键的含义、语法、默认或文件格式”先走 reference。混合问题先确定阶段，再查该阶段需要的精确资料。基础文件说明和入门概念属于 reference，不额外增加一条工作流。
 
@@ -114,6 +115,7 @@ pasp-dft/
 | --- | --- | --- |
 | [audit_inputs.py](knowledge/scripts/audit_inputs.py) | include/块、结构/UPF 依赖、默认/条件设置与并行池静态审计 | Python 3.10+，仅标准库；保留包内参数表 |
 | [analyze_md.py](knowledge/scripts/analyze_md.py) | 原生逐帧完整性、时间/步数、统计窗与日志一致性 | Python 3.10+，分析仅标准库 |
+| [analyze_relax.py](knowledge/scripts/analyze_relax.py) | 固定晶胞离子弛豫的逐步能量、最大力、终止证据和末次完整坐标 | Python 3.10+，可选 PNG 需 Matplotlib |
 | [analyze_outputs.py](knowledge/scripts/analyze_outputs.py) | 日志证据摘要、阶段状态、文件清点 | Python 3.10+，仅标准库 |
 | [analyze_eigenvalues.py](knowledge/scripts/analyze_eigenvalues.py) | 原生 bands 或 stdout `EIGENVAL` 表、条件采样带边 | Python 3.10+、NumPy；保留同目录 `plot_bands.py` |
 | [plot_bands.py](knowledge/scripts/plot_bands.py) | 原生能带 PNG/PDF/SVG 与 JSON | Python 3.10+、NumPy、Matplotlib |
@@ -123,7 +125,7 @@ pasp-dft/
 
 ### 输入静态审计
 
-六个公开 CLI 均从实际技能根目录调用。先按当前版本的 `--help` 选择选项；下面的输入路径由用户替换，输出必须是尚不存在的新文件。
+公开 CLI 均从实际技能根目录调用。先按当前版本的 `--help` 选择选项。下面的输入路径由用户替换，输出必须是尚不存在的新文件。
 
 ```bash
 python -B "$PASP_DFT_ROOT/knowledge/scripts/audit_inputs.py" --help
@@ -147,7 +149,17 @@ python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" output_MD.dat --input
 
 `analyze_md.py` 退出 1 表示确定的帧/长度/日志或文件错误，CLI 参数错误为 2；退出 0 仍不认证物理收敛。NVT/NPT 不套用 NVE 守恒判据，扩展焓/能量定义、统计窗、热平衡、时间步和截断收敛仍须解释。日志摘要不能替代逐帧分析，两份报告可以互补。
 
-两个新工具默认英文，支持 `--lang en|zh-Hans|zh-Hant`、`--format markdown|json` 与拒绝覆盖的 `--output`；省略输出文件则向标准输出写报告。它们不要求源码、私有脚本或 PASP 执行。
+输入审计、MD 和弛豫工具的 Markdown 报告默认英文，支持 `--lang en|zh-Hans|zh-Hant`、`--format markdown|json` 与拒绝覆盖的 `--output`。省略输出文件时将报告写到标准输出。分析可离线运行，无需 PASP.x、源码或私有脚本。
+
+### 固定晶胞离子弛豫分析（0.3.2）
+
+```bash
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_relax.py" --help
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_relax.py" relax.answer --input lattice_model.fdf --lang zh-Hans --format json --output relax-report.json
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_relax.py" relax.answer --plot relax-curves.png --xyz relax-final.xyz --symbols Ba Ti O O O
+```
+
+日志文件名不限，`--input` 可附本次运行匹配的 FDF。报告从步 0 开始提取每步能量、相邻步能量差、最大力范数及原子序号，并分别记录离子终止、进程完成、电子求解和阈值诊断的证据。退出 0 可包含正常结束但达到步数上限的运行。XYZ 需要按日志原子顺序提供实际元素，示例为五原子 BaTiO3。末次完整坐标来自日志舍入值，适合检查和可视化。退出码、阈值单位及结构精度见 [弛豫分析](knowledge/reference/topics/relaxation-analysis.md)。
 
 ### 日志、能级与能带
 
@@ -160,7 +172,7 @@ python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_eigenvalues.py" spectrum --i
 python -B "$PASP_DFT_ROOT/knowledge/scripts/plot_bands.py" spectrum --output-dir figures --name bands-ev --unit eV --title "Electronic band structure"
 ```
 
-目录日志扫描默认不递归，需分析子目录时显式使用 `--recursive`。报告默认英语，输入/MD/日志/能级/场报告可选 `--lang en`、`zh-Hans`、`zh-Hant`；JSON 键、状态码和原始证据保持稳定。**`plot_bands.py` 没有 `--lang`**，科学图内使用清楚的标题、坐标和必要图例，收敛与来源限制写在图外报告和 JSON。
+目录日志扫描默认不递归，需分析子目录时显式使用 `--recursive`。报告默认英语，输入、MD、弛豫、日志、能级和场报告可选 `--lang en`、`zh-Hans`、`zh-Hant`，JSON 键、状态码和原始证据保持稳定。**`plot_bands.py` 没有 `--lang`**，科学图内使用清楚的标题、坐标和必要图例，收敛与来源限制写在图外报告和 JSON。
 
 能带/能级默认 eV，也支持 meV、Ha/Hartree、Ry/Rydberg；自定义单位须同时给正有限 `--units-per-hartree`。`--reference-ha`、`--ef-hartree` 始终使用 Hartree。原生 bands 的绝对能量按文件头参考只减一次；已移位的 `plot.dat` 不能再减一次，也不是此原生读取器的完整输入。
 

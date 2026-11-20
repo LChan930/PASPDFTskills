@@ -10,7 +10,7 @@
 | 固定晶胞离子弛豫、BaTiO3 极性构型 | [打开工作流](../workflow-pw-relax/skill.md) |
 | PWRS、零/有限磁通、磁边界及运行选项 | [打开工作流](../workflow-pwrs-magnetic/skill.md) |
 | 原生 DFT.LMD 的 NVE/NVT/NPH/NPT | [打开工作流](../workflow-pw-md/skill.md) |
-| 已有日志、能级、能带绘图、DOS、MD 结果分析 | [打开工作流](../workflow-output-analysis/skill.md) |
+| 已有日志、固定晶胞离子弛豫、能级、能带绘图、DOS、MD 结果分析 | [打开工作流](../workflow-output-analysis/skill.md) |
 
 选择最直接的工作流；交叉任务先定位主阶段，再补充必要参考。已由用户确定的任务不重复询问许可。材料、磁序、赝势、计算类型等关键物理事实缺失时，只询问阻碍当前阶段的问题；已有授权范围内的整理和检查继续进行。
 
@@ -35,5 +35,7 @@
 ## 包内自动化优先
 
 准备或检查 PW/PWRS 输入时，先读 [输入审计契约](../../knowledge/reference/topics/input-audit.md)，运行实际根目录的 `knowledge/scripts/audit_inputs.py`；使用确切 FDF 或运行目录，按已知分配传 `--ranks`，只在有全局约化 k 点证据时传 `--irreducible-kpoints`。解释 ERROR/WARN/UNKNOWN，默认与条件覆盖不是物理推荐，静态通过不晋级为运行/收敛通过。
+
+已有固定晶胞离子弛豫日志走 [输出分析](../workflow-output-analysis/skill.md)，同一弛豫任务运行后的核对走 [弛豫](../workflow-pw-relax/skill.md) 的 S6–S7。两处使用包内 `knowledge/scripts/analyze_relax.py`，按证据报告离子终止、进程完成、电子状态与阈值诊断。接口和单位见 [弛豫分析](../../knowledge/reference/topics/relaxation-analysis.md)。
 
 已有 MD 轨迹走 [输出分析](../workflow-output-analysis/skill.md) 或 [MD](../workflow-pw-md/skill.md)，执行包内 `knowledge/scripts/analyze_md.py`，可附匹配 `--input`、`--log` 及明确的 fs 统计窗。逐帧检查和统计交给确定性工具；ensemble 守恒量、平衡及数值收敛由原始证据解释。不临时重写相同解析器，也不要求用户持有源码或研讨会私有脚本。

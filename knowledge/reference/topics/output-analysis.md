@@ -131,6 +131,11 @@ recognized block, warning when incomplete. Constraints or force projections
 may matter. Finite forces from unconverged SCF do not prove variational accuracy
 or completed geometry optimization.
 
+For a native fixed-cell ionic relaxation log, run `analyze_relax.py` for
+per-step energies, force norms and atom IDs, the last complete logged geometry,
+and the distinct ionic, process and electronic evidence. See
+[relaxation analysis](relaxation-analysis.md).
+
 For recognized ordinary PW total stress, units are Ha/Bohr^3 and kbar, with
 positive compression; 1 kbar = 0.1 GPa. The helper reads explicitly labeled
 total tensors, not kinetic/Hubbard components as totals. Confirm the convention

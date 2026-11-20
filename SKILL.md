@@ -1,6 +1,6 @@
 ---
 name: pasp-dft
-description: "面向持有 PASP.x 的用户，准备与检查 PW/PWRS 输入，指导 SCF、能带、磁性、SOC、DFT+U、弛豫和原生 MD，分析已有日志、能级与 DOS，并绘制能带及电荷/电流场。"
+description: "准备与检查 PASP PW/PWRS 输入，指导 SCF、能带、磁性、SOC、DFT+U、固定晶胞离子弛豫和原生 MD，离线分析已有日志、弛豫、能级与 DOS，并绘制能带及电荷/电流场。"
 ---
 
 # pasp_DFT
@@ -53,7 +53,9 @@ do not invoke colon-qualified nested skill names or assume separate registration
 - PW SCF, fixed-density path bands and SCF-reference handoff.
 - Collinear magnetism, AFM and DFT+U.
 - Noncollinear and SOC comparisons.
-- Fixed-cell ionic relaxation.
+- Fixed-cell ionic relaxation and offline analysis of native relaxation logs
+  with `knowledge/scripts/analyze_relax.py`. See the
+  [relaxation analysis contract](knowledge/reference/topics/relaxation-analysis.md).
 - PWRS orbital magnetic fields, zero/finite flux and boundary settings.
 - Native ionic MD with its supported ensemble branches.
 - Native MD frame, time, energy, temperature and log consistency analysis with `knowledge/scripts/analyze_md.py`; read the [MD analysis contract](knowledge/reference/topics/md-analysis.md). File completeness does not certify physical convergence.

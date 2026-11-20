@@ -46,6 +46,8 @@
 
 同时需要 `DFT.LRELAX T` 与正 `DFT.nstep`。默认nstep0仅初始SCF/力应力，不更新离子。`DFT.EDIFFG`正值为Ha能量变化阈值，负值绝对值为eV/Angstrom力阈值；与电子EDIFF分开。质量块和实际结构必须正确，不用未知默认制作物理收敛结论。
 
+现有弛豫日志的相邻步能量差可用于正 `DFT.EDIFFG` 的诊断。离子停止按优化器实际打印的退出证据判断。见 [弛豫分析](../topics/relaxation-analysis.md)。
+
 ## TDDFT
 
 独立TDDFT使用 `DFT.LTDDFT T`。参考ISPIN2拒绝，ISPIN1关闭原子磁矩输出；其他自旋/外场组合先核对发行资料。NAMD会覆盖多项同名相关设置，不能将以下默认直接当NAMD有效值。

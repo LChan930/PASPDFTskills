@@ -1,6 +1,6 @@
 ---
 name: workflow-output-analysis
-description: 已有输出：日志、能带、能级、DOS 与 MD；pasp-dft 内部本地工作流，不是独立安装技能。
+description: 分析已有日志、固定晶胞离子弛豫、能带、能级、DOS 与 MD。
 ---
 
 先读[状态机](../../knowledge/workflows/output_analysis_state_machine.md)，定位S0–S7与实际分支，再只读[完整教程](../../knowledge/workflows/output_analysis.md)当前阶段。操作交接用[检查单](../../knowledge/workflows/output_analysis_user_checklist.md)，历史证据只读[run notes](../../knowledge/workflows/output_analysis_run_notes.md)。
@@ -14,3 +14,7 @@ description: 已有输出：日志、能带、能级、DOS 与 MD；pasp-dft 内
 ## MD 自动分析入口
 
 原生轨迹使用 `knowledge/scripts/analyze_md.py`，先查看实际 `--help` 与 [MD 契约](../../knowledge/reference/topics/md-analysis.md)。轨迹为位置参数；可提供 `--input`、`--log`、`--window-start-fs`、`--window-end-fs`。输出支持 `--lang en|zh-Hans|zh-Hant`、`--format markdown|json`、拒绝覆盖的 `--output`。完整帧/连续性、请求长度、窗口统计和日志核对使用工具结果；缺少证据仍写 unknown，统计成功不等于热平衡或物理收敛。
+
+## 固定晶胞离子弛豫分析
+
+原生弛豫日志使用 `knowledge/scripts/analyze_relax.py`。传实际日志路径，文件名不限，可附匹配的 `--input`。使用专用报告读取每步能量、最大力及原子序号和最后一帧完整坐标。结合日志原文核对离子停止原因、进程完成、显式 SCF 证据与输入阈值。见 [弛豫分析](../../knowledge/reference/topics/relaxation-analysis.md)。

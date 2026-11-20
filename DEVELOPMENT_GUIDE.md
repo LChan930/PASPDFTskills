@@ -148,17 +148,20 @@ python -B "$PASP_DFT_ROOT/knowledge/scripts/plot_fields.py" --help
 
 交接记录列出实际修改文件、测试范围、输出位置和未解决问题。对复杂行为修改可做独立有界审查；审查发现须落实到具体资源和证据，不通过额外确认流程替代可完成的验证。
 
-## 0.3.0 确定性自动化契约
+## 确定性自动化契约
 
-公开 CLI 共六个：`audit_inputs.py`、`analyze_md.py`、`analyze_outputs.py`、`analyze_eigenvalues.py`、`plot_bands.py`、`plot_fields.py`。输入审计与 MD 统计不再依赖一次性的现场解析脚本；路由应先执行包内工具，再解释其 JSON 与原始证据。新增工具报告支持 `--lang en|zh-Hans|zh-Hant`、`--format markdown|json`，输出独占创建。保持退出码契约与实际 `--help` 一致：输入审计完成可含 ERROR/UNKNOWN；MD 的确定错误可返回非零；两者均不证明物理正确。
+公开 CLI 包括 `audit_inputs.py`、`analyze_md.py`、`analyze_relax.py`、`analyze_outputs.py`、`analyze_eigenvalues.py`、`plot_bands.py` 和 `plot_fields.py`。输入审计、MD 与弛豫路由执行包内工具，再核对 JSON 与原始证据。三者支持 `--lang en|zh-Hans|zh-Hant` 和 `--format markdown|json`，输出独占创建。保持退出码契约与实际 `--help` 一致。输入审计完成可含 ERROR/UNKNOWN，MD 与弛豫检测到运行或数据问题时可返回非零。物理精度需要独立证据。
 
 输入审计读取随包参数表作为有界登记快照。未知键保留未知，requested、参考 default、可推导 effective 与实际 read-back 分开。缺少发行资料、匹配重启来源、IBZ 或数值收敛时不得补造证据。不得为了通过池整除而更改采样或物理设置。详见 [输入审计](knowledge/reference/topics/input-audit.md)。
 
 MD 自动化应覆盖原生逐帧完整性、有限值、原子标识、步/时间与请求长度核对、显式窗口统计和日志一致性；输入/日志缺失则降低证据范围。NVE/NVT/NPH/NPT 的守恒量和热力学解释继续按 [MD 分析](knowledge/reference/topics/md-analysis.md) 判断，物理精度由实际收敛测试建立。
 
-发布时对六个实际 CLI 执行 `--help`，并以真实用户文件完成新增工具的功能与负例测试；帮助/链接通过不能替代功能证据。新增脚本链接与参数示例须与候选包验证。先完成同一候选包，再构建 ZIP、逐文件 SHA-256 和安装映射；整个已安装前像必须一致，备份在技能发现目录之外。安装只写变更/新文件，不能删除或覆盖并行修改。
+弛豫日志分析覆盖步 0、离子步、完整原子表和末次完整坐标。发布验证覆盖真实固定晶胞日志、截断、步数上限、正能量阈值和 SCF 失败。详见 [弛豫分析](knowledge/reference/topics/relaxation-analysis.md)。
+
+发布时对所有公开 CLI 执行 `--help`，并以真实用户文件完成新增工具的功能与负例测试。新增脚本链接与参数示例须在候选包验证。先完成同一候选包，再构建 ZIP、逐文件 SHA-256 和安装映射。整个已安装前像必须一致，备份在技能发现目录之外。安装只写变更/新文件，不能删除或覆盖并行修改。
 
 ```bash
 python -B "$PASP_DFT_ROOT/knowledge/scripts/audit_inputs.py" --help
 python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_md.py" --help
+python -B "$PASP_DFT_ROOT/knowledge/scripts/analyze_relax.py" --help
 ```
